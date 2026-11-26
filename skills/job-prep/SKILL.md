@@ -36,6 +36,10 @@ Write `output/<company>-<role>/prep.md`:
 - Story map: likely behavioral question → story from `profile/stories.md`. Flag gaps and help draft a story from real experience.
 - Three questions for them to ask the interviewers.
 
+## Daily practice
+
+The plan's practice days run through `job-practice`: it picks the next problems (from `get_prep_plan` for this company when connected), runs them, and logs results.
+
 ## 4. Mock rounds
 
 On request, play the interviewer for one round type at a time.

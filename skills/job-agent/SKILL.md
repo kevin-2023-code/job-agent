@@ -30,11 +30,25 @@ Check once per session: if `get_account` exists, call it. If it answers, you are
 | Answers forms keep asking | `update_application_answers` | `saved_answers` in `profile/profile.yml` |
 | Goals, targets, constraints | `list_context_notes`, `save_context_note`, `update_job_search` | `profile/profile.yml` |
 | Tracker | `track_application`, `update_application`, `list_applications`, `report_application` | `job-agent track` |
-| Practice plan | `get_prep_plan`, `search_questions`, `get_my_progress` | `knowledge/`, web |
+| Practice (what to solve next, by company, topic or weakness) | `get_prep_plan`, `search_questions`, `get_my_progress`, `search_site_content` (lessons, articles) | problems you set, a log in `knowledge/practice/` |
 | People to reach | `list_contacts`, `find_contacts`, `update_contact` | the candidate's own network notes in `knowledge/` |
 | Multi-step rules for a task | `get_playbook` | the skill file |
 
 The candidate's `knowledge/` folder is read in both modes: their own interview notes, research and recruiter emails often answer what no server can.
+
+## Not sure? Look it up before you ask or guess
+
+Whenever you are unsure of something (a form field, a fact about the candidate, how a company interviews, whether a role is still open, whether they already applied), check the records before you ask the candidate, and never fill the gap with a guess. In order:
+
+1. **Connected, the server**, which usually has the answer already:
+   - About the candidate: `get_application_checklist` (what's on file and what's missing), `get_resume`, `list_context_notes`, `list_my_conversations` + `get_my_conversation` (what they already told TrueInterview's Co-pilot), `list_applications`.
+   - About a form field: `prepare_application` again (with `job_url` for a page you're on); a field it marks `filled` is settled. An open question → `draft_answers`. A fact only the candidate has → ask them, then save it with `update_application_answers` so no form asks again.
+   - About a role or company: `get_job`, `screen_jobs`, `get_company_intel`, `search_site_content`.
+   - About how to run a task: `get_playbook` for that task.
+2. **Their files**: `job-agent kb search …`, `profile/`.
+3. **Only then ask the candidate**, all the open questions in one message, and keep the answer (server or `profile/`) so it's asked once.
+
+Say where an answer came from when it isn't obvious ("from your saved answers", "from your note of 11-20").
 
 When connected, the server is the system of record for the résumé, saved answers, job search and tracker. Don't keep a second local copy in sync by hand; if the candidate edits `profile/cv.md`, sync it with `import_resume`.
 
@@ -66,6 +80,7 @@ Local files live in one folder, the workspace. `job-agent where` prints it: the 
 | `job-track` | Replies, interviews, rejections, "where do I stand?", follow-ups |
 | `job-prep` | An interview is booked, or "mock me" |
 | `job-outreach` | "Who can I talk to at…?", referrals, a note to a recruiter |
+| `job-practice` | "Give me a problem", "what should I practise?", daily drills, weak topics, mock coding / design rounds |
 
 Each skill is `skills/<name>/SKILL.md`. If your agent doesn't load skills on its own, read the matching file before starting that task.
 

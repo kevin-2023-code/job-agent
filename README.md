@@ -2,7 +2,7 @@
 
 Open-source job-search skills for the AI agent you already use: Claude Code, Codex, Cursor, VS Code / GitHub Copilot, Gemini CLI, Windsurf, OpenCode.
 
-Tell it what you want and it finds the roles worth your time, scores each against your goals, tailors your résumé without inventing anything, fills in the application form in your browser up to the Submit button, keeps your tracker current, finds someone to refer you, and preps you for the loop that follows.
+Tell it what you want and it finds the roles worth your time, scores each against your goals, tailors your résumé without inventing anything, fills in the application form in your browser up to the Submit button, keeps your tracker current, finds someone to refer you, preps you for the loop that follows, and drills you every day on what you're weakest at.
 
 [中文说明](README.zh-CN.md)
 
@@ -58,7 +58,9 @@ Two modes, and every skill works in both:
 - **Connected.** With the [TrueInterview](https://trueinterview.io) MCP signed in, the agent gets live postings across companies ranked for you, how each company actually interviews (rounds, topics, recently reported questions), fit scores, your résumé and saved answers, every application form read and answered from your records, and a tracker shared with the website. A free account works.
 - **Local.** Without it, everything runs from your own files: résumé, preferences, a `knowledge/` folder of your interview notes and research, and the public Greenhouse, Lever, Ashby and SmartRecruiters boards of the companies you list.
 
-The agent checks which mode it's in and never stops because the server is missing. [`docs/data-sources.md`](docs/data-sources.md) has the details, including what is sent where.
+The agent checks which mode it's in and never stops because the server is missing.
+
+**When it isn't sure, it looks it up instead of guessing or asking you.** A form field it can't answer, a fact about you, how a company interviews: connected, it checks your saved answers, résumé, notes, earlier conversations and the company's record on TrueInterview first, then your local files, and only then asks you, once, and saves the answer so no form asks again. [`docs/data-sources.md`](docs/data-sources.md) has the details, including what is sent where.
 
 ## Skills
 
@@ -72,6 +74,7 @@ The agent checks which mode it's in and never stops because the server is missin
 | "I heard back from…" | `job-track` | Tracker updated, follow-ups drafted, honest weekly numbers |
 | "Prep me for the onsite" | `job-prep` | The loop round by round, a day-by-day plan with practice links, story map, mock interviews with real feedback |
 | "Who can refer me at…?" | `job-outreach` | The right two or three people and a short note for you to send |
+| "Give me a problem" / "mock me" | `job-practice` | What to practise next (due revision, your pipeline's companies, your weak topics), coaching with hints instead of answers, timed mock rounds, and a log of the mistakes to fix next |
 
 ## What it won't do
 
