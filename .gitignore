@@ -1,0 +1,18 @@
+node_modules/
+
+# Your data. Never committed.
+profile/*
+!profile/.gitkeep
+knowledge/*
+!knowledge/.gitkeep
+data/*
+!data/.gitkeep
+reports/*
+!reports/.gitkeep
+output/*
+!output/.gitkeep
+portals.yml
+
+.env
+*.log
+.DS_Store

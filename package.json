@@ -1,0 +1,29 @@
+{
+  "name": "job-agent",
+  "version": "0.1.0",
+  "description": "A local, open-source job-search agent: evaluate postings, scan job boards, tailor your CV, prepare applications and track everything, from the AI coding agent you already use.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "scan": "node scripts/scan.mjs",
+    "track": "node scripts/track.mjs",
+    "pdf": "node scripts/cv-pdf.mjs",
+    "kb": "node scripts/kb.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "yaml": "^2.5.0"
+  },
+  "keywords": [
+    "job-search",
+    "claude-code",
+    "agent-skills",
+    "resume",
+    "career"
+  ]
+}
