@@ -1,0 +1,6 @@
+{
+  "contextFileName": "AGENTS.md",
+  "mcpServers": {
+    "trueinterview": { "httpUrl": "https://trueinterview.io/api/mcp" }
+  }
+}

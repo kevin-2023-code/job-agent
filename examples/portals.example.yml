@@ -1,5 +1,5 @@
-# Job boards to scan. Copied to portals.yml by `npm run setup`.
-# `npm run scan` reads each company's public job board API (no login, no scraping of
+# Job boards to scan. Copied to portals.yml by `job-agent init`.
+# `job-agent scan` reads each company's public job board API (no login, no scraping of
 # pages you need an account for) and lists new matching postings in data/pipeline.md.
 #
 # Supported ATS:   greenhouse  -> boards.greenhouse.io/<board>

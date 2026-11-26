@@ -11,7 +11,7 @@ import { readTracker } from './lib/tracker.mjs';
 const args = parseArgs(process.argv.slice(2));
 const portals = readYaml(PATHS.portals);
 if (!portals) {
-  console.error('No portals.yml. Run `npm run setup`, then edit portals.yml.');
+  console.error('No portals.yml. Run `job-agent init`, then edit portals.yml.');
   process.exit(1);
 }
 
@@ -63,7 +63,7 @@ if (args.json) {
 if (!args['dry-run'] && fresh.length) {
   mkdirSync(dirname(PATHS.pipeline), { recursive: true });
   if (!existsSync(PATHS.pipeline)) {
-    writeFileSync(PATHS.pipeline, '# Pipeline\n\nNew postings from `npm run scan`, one block per scan, newest postings first. Triage with the job-evaluate skill.\n');
+    writeFileSync(PATHS.pipeline, '# Pipeline\n\nNew postings from `job-agent scan`, one block per scan, newest postings first. Triage with the job-evaluate skill.\n');
   }
   const lines = fresh
     .sort((a, b) => (b.posted || '').localeCompare(a.posted || ''))

@@ -1,0 +1,40 @@
+# Job boards to scan. Copied to portals.yml by `job-agent init`.
+# `job-agent scan` reads each company's public job board API (no login, no scraping of
+# pages you need an account for) and lists new matching postings in data/pipeline.md.
+#
+# Supported ATS:   greenhouse  -> boards.greenhouse.io/<board>
+#                  lever       -> jobs.lever.co/<board>
+#                  ashby       -> jobs.ashbyhq.com/<board>
+#                  smartrecruiters -> jobs.smartrecruiters.com/<board>
+# The board name is the last part of the company's careers URL on that system.
+
+filters:
+  title_include:            # a posting must match at least one (case-insensitive)
+    - software engineer
+    - machine learning
+    - ml engineer
+    - backend
+    - infrastructure
+  title_exclude:            # and none of these
+    - intern
+    - manager
+    - sales
+    - account executive
+    - recruiter
+  locations:                # empty = any. Matches anywhere in the location text
+    - remote
+    - san francisco
+    - new york
+    - seattle
+  max_age_days: 30          # skip postings older than this, when the board gives a date
+
+companies:
+  - { name: Anthropic,  ats: greenhouse, board: anthropic }
+  - { name: Stripe,     ats: greenhouse, board: stripe }
+  - { name: Databricks, ats: greenhouse, board: databricks }
+  - { name: Figma,      ats: greenhouse, board: figma }
+  - { name: OpenAI,     ats: ashby,      board: openai }
+  - { name: Ramp,       ats: ashby,      board: ramp }
+  - { name: Notion,     ats: ashby,      board: notion }
+  - { name: Palantir,   ats: lever,      board: palantir }
+  - { name: Spotify,    ats: lever,      board: spotify }

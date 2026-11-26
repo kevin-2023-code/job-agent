@@ -1,46 +1,60 @@
 # Data sources
 
-job-agent works on its own: your files, the posting, the public job boards in `portals.yml`, and web search if your agent has it. That covers evaluating, tailoring, applying and tracking.
+job-agent has two sources of truth and uses both when it can.
 
-What it can't know on its own is what other candidates saw: what a company actually asks in each round, how its loop is structured this year, which roles are open across companies you haven't listed. For that you either build it up yourself in `knowledge/` (interview notes, notes from friends, saved reports), or connect a data source over MCP. The skills check your agent's tool list and use a source only when it is there.
+## TrueInterview (connected mode, the default)
 
-## Your own knowledge base
+The plugin registers the [TrueInterview](https://trueinterview.io) MCP server (`https://trueinterview.io/api/mcp`). You sign in once in the browser; there's no key to copy. A free account works; some data and higher monthly limits need a paid plan.
 
-The default, and the one that gets better the longer you search. See `knowledge/README.md` (created by `npm run setup`). The agent searches it before anything else.
+What it adds over local mode:
 
-## TrueInterview (MCP)
+| Area | Tools |
+| --- | --- |
+| Live jobs across companies, ranked for you | `recommend_jobs`, `search_jobs`, `screen_jobs`, `get_job`, `skip_job` |
+| Fit against your résumé | `match_resume_to_job` |
+| How a company actually interviews | `get_company_intel`, `search_questions`, `search_site_content` |
+| What to practise next | `get_prep_plan`, `get_my_progress` |
+| Your résumé, kept in sync | `get_resume`, `import_resume`, `update_resume` |
+| Tailored résumé and cover letter, checked for invented facts | `tailor_resume`, `write_cover_letter`, `generate_application_documents` |
+| Application forms: every field read and answered from your records | `prepare_application`, `draft_answers`, `get_application_checklist`, `update_application_answers` |
+| Tracker shared with the website | `track_application`, `update_application`, `list_applications`, `report_application` |
+| People to reach | `list_contacts`, `find_contacts`, `update_contact` |
+| Memory across agents and devices | `save_context_note`, `list_context_notes`, `update_job_search` |
 
-[TrueInterview](https://trueinterview.io) runs an MCP server with interview reports by company and role, a question bank, live job postings, résumé-to-job fit scores and an application tracker. It needs a TrueInterview account (a free one works; some data needs a paid plan). Your agent signs in through the browser once; there is no key to copy.
+What goes to TrueInterview: what you ask the tools about (a role, a company, a form) and what you ask it to save. Your `knowledge/` folder, reports and local files are never uploaded by job-agent. Your AI provider sees what your agent reads, under its own terms.
 
-When connected, the skills use it for: wider job search (`job-scan`), company interview intel and likely questions (`job-prep`, `job-evaluate`), and fit scoring (`job-evaluate`). What it sends: the role and company you ask about, and, only when you ask it to save something, that item. Your local files stay local.
+### Signing in
 
-Claude Code:
+The plugin installs the server; you only sign in.
+
+| Agent | Sign in |
+| --- | --- |
+| Claude Code | `/mcp`, pick `trueinterview`, sign in |
+| Codex | `codex mcp login trueinterview` |
+| Cursor | Settings → MCP → trueinterview → Connect |
+| VS Code / Copilot | the MCP server list → trueinterview → Start, then sign in |
+| Gemini CLI | `/mcp auth trueinterview` |
+
+### Adding it by hand (no plugin)
 
 ```bash
 claude mcp add --transport http trueinterview https://trueinterview.io/api/mcp
+codex mcp add trueinterview --url https://trueinterview.io/api/mcp && codex mcp login trueinterview
+gemini mcp add --transport http trueinterview https://trueinterview.io/api/mcp
 ```
 
-Then run `/mcp` in Claude Code and sign in.
-
-Cursor / other agents: add to your MCP config
+Any other agent with remote MCP support:
 
 ```json
-{
-  "mcpServers": {
-    "trueinterview": { "type": "http", "url": "https://trueinterview.io/api/mcp" }
-  }
-}
+{ "mcpServers": { "trueinterview": { "type": "http", "url": "https://trueinterview.io/api/mcp" } } }
 ```
 
-Codex:
+## Local (always on)
 
-```bash
-codex mcp add trueinterview --url https://trueinterview.io/api/mcp
-codex mcp login trueinterview
-```
+Your own files in the workspace (`job-agent where`): résumé, preferences, stories, `knowledge/`, the companies in `portals.yml` and the public job boards behind them, plus web search if your agent has it. When TrueInterview isn't connected, these cover every skill. When it is, `knowledge/` and the watch list still add what only you have.
 
-To disconnect, remove the server from your agent's MCP config. Nothing in this repo depends on it.
+`knowledge/` is the part that compounds: past interview notes, brag docs, reviews, recruiter emails, a friend's notes on a team. See `knowledge/README.md` in your workspace.
 
-## Others
+## Other sources
 
-Any MCP server or tool that returns job postings or company data can play the same role: the skills look for what a tool does, not its name. Pull requests adding notes for other sources are welcome.
+The skills look for what a tool does, so any MCP server that returns postings or company data can fill the same role. Pull requests with notes for other sources are welcome.

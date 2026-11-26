@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { resolve, basename } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { p, parseArgs } from './lib/paths.mjs';
+import { pkg, parseArgs } from './lib/paths.mjs';
 import { renderMarkdown } from './lib/markdown.mjs';
 
 const args = parseArgs(process.argv.slice(2));
@@ -19,7 +19,7 @@ if (!input || !existsSync(input)) {
 
 const md = readFileSync(input, 'utf8');
 const title = (/^#\s+(.+)$/m.exec(md)?.[1] ?? basename(input, '.md')).trim();
-const template = readFileSync(p('templates', 'cv.html'), 'utf8');
+const template = readFileSync(pkg('templates', 'cv.html'), 'utf8');
 const html = template
   .replace('{{title}}', title.replace(/</g, '&lt;'))
   .replace('{{page_size}}', args.letter ? 'Letter' : 'A4')

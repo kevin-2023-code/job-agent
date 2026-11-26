@@ -1,4 +1,4 @@
-# Your job-search profile. Copied to profile/profile.yml by `npm run setup`.
+# Your job-search profile. Copied to profile/profile.yml by `job-agent init`.
 # Everything here stays on your machine. The agent reads it before every task.
 
 name: Alex Chen
@@ -47,8 +47,8 @@ work_authorization:
   earliest_start: ""
 
 apply:
-  fill_forms: false            # true lets an agent with a browser fill fields; it still stops before Submit
-  voluntary_disclosures: decline   # decline | ask_each_time
+  fill_forms: true             # the agent fills application forms in your browser and stops before Submit
+  voluntary_disclosures: decline   # decline (pick the form's decline option) | ask_each_time
   cover_letter: when_asked     # always | when_asked | never
 
 # Answers forms keep asking. The agent fills these in for you over time, on your word.

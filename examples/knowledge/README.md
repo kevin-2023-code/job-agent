@@ -11,4 +11,4 @@ Good things to put here:
 - **Prep material**: your own notes on system design, the problem patterns you get wrong, mock feedback.
 - **Performance reviews and brag docs**: the best raw material for CV bullets and stories.
 
-Markdown and plain text work best. Run `npm run kb -- index` after adding files, so the agent gets a table of contents in `knowledge/INDEX.md`.
+Markdown and plain text work best. Run `job-agent kb index` after adding files, so the agent gets a table of contents in `knowledge/INDEX.md`.

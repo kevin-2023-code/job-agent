@@ -68,3 +68,61 @@ test('parseDate', () => {
   assert.match(parseDate('+7d'), /^\d{4}-\d{2}-\d{2}$/);
   assert.throws(() => parseDate('next week'));
 });
+
+import { parseYaml } from '../scripts/lib/yaml-lite.mjs';
+import { resolveWorkspace, PKG_ROOT } from '../scripts/lib/paths.mjs';
+import { readFileSync as rf } from 'node:fs';
+
+test('yaml-lite reads the example profile and portals', () => {
+  const prof = parseYaml(rf(join(PKG_ROOT, 'examples', 'profile.example.yml'), 'utf8'));
+  assert.equal(prof.name, 'Alex Chen');
+  assert.deepEqual(prof.targets.roles.slice(0, 1), ['Senior Software Engineer']);
+  assert.equal(prof.targets.min_grade, 'C');
+  assert.deepEqual(prof.targets.industries, ['developer tools', 'AI infrastructure', 'fintech']);
+  assert.equal(prof.compensation.base_min, 180000);
+  assert.equal(prof.work_authorization.needs_sponsorship, true);
+  assert.equal(prof.apply.fill_forms, true);
+  assert.equal(prof.phone, '');
+  assert.match(prof.targets.why, /^Want to own .* ships weekly\.$/);
+  const portals = parseYaml(rf(join(PKG_ROOT, 'examples', 'portals.example.yml'), 'utf8'));
+  assert.equal(portals.filters.max_age_days, 30);
+  assert.ok(portals.filters.title_exclude.includes('intern'));
+  assert.deepEqual(portals.companies[0], { name: 'Anthropic', ats: 'greenhouse', board: 'anthropic' });
+});
+
+test('yaml-lite: list of block maps, quotes, comments', () => {
+  const y = parseYaml('a:\n  - name: x # c\n    n: 2\n  - name: "y: z"\n    n: 3\nb: \'it\'\'s\'\nc: [1, "two", {k: v}]\nd:\n- p\n- q\n');
+  assert.deepEqual(y.a, [{ name: 'x', n: 2 }, { name: 'y: z', n: 3 }]);
+  assert.equal(y.b, "it's");
+  assert.deepEqual(y.c, [1, 'two', { k: 'v' }]);
+  assert.deepEqual(y.d, ['p', 'q']);
+});
+
+test('workspace resolution', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ja-ws-'));
+  assert.equal(resolveWorkspace({ JOB_AGENT_HOME: dir }, '/nowhere'), dir);
+});
+
+import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+
+test('installer: file-based agents into a sandbox home, then uninstall', () => {
+  const home = mkdtempSync(join(tmpdir(), 'ja-home-'));
+  const env = { ...process.env, HOME: home, USERPROFILE: home, APPDATA: join(home, 'AppData'), JOB_AGENT_HOME: '' };
+  delete env.JOB_AGENT_HOME;
+  const bin = join(PKG_ROOT, 'bin', 'job-agent.mjs');
+  const r = spawnSync(process.execPath, [bin, 'install', '--agents', 'cursor,gemini,windsurf,copilot', '--yes'], { env, encoding: 'utf8', input: '' });
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(existsSync(join(home, '.agents', 'skills', 'job-apply', 'SKILL.md')));
+  assert.ok(existsSync(join(home, '.job-agent', 'bin', 'job-agent.mjs')));
+  assert.ok(existsSync(join(home, 'job-agent', 'profile', 'profile.yml')));
+  const cursor = JSON.parse(rf(join(home, '.cursor', 'mcp.json'), 'utf8'));
+  assert.equal(cursor.mcpServers.trueinterview.url, 'https://trueinterview.io/api/mcp');
+  const gemini = JSON.parse(rf(join(home, '.gemini', 'settings.json'), 'utf8'));
+  assert.equal(gemini.mcpServers.trueinterview.httpUrl, 'https://trueinterview.io/api/mcp');
+  const u = spawnSync(process.execPath, [bin, 'uninstall', '--agents', 'cursor,gemini,windsurf,copilot'], { env, encoding: 'utf8', input: '' });
+  assert.equal(u.status, 0, u.stderr);
+  assert.ok(!existsSync(join(home, '.agents', 'skills', 'job-apply')));
+  assert.equal(JSON.parse(rf(join(home, '.cursor', 'mcp.json'), 'utf8')).mcpServers.trueinterview, undefined);
+  assert.ok(existsSync(join(home, 'job-agent', 'profile', 'profile.yml')), 'workspace kept');
+});

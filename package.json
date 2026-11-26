@@ -1,29 +1,50 @@
 {
   "name": "job-agent",
-  "version": "0.1.0",
-  "description": "A local, open-source job-search agent: evaluate postings, scan job boards, tailor your CV, prepare applications and track everything, from the AI coding agent you already use.",
+  "version": "0.2.0",
+  "description": "Open-source job-search skills for any AI agent: find and score roles, tailor your résumé, fill application forms up to Submit, track and prep. Uses the TrueInterview MCP when connected, your local files when not.",
   "type": "module",
   "license": "MIT",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "setup": "node scripts/setup.mjs",
-    "scan": "node scripts/scan.mjs",
-    "track": "node scripts/track.mjs",
-    "pdf": "node scripts/cv-pdf.mjs",
-    "kb": "node scripts/kb.mjs",
-    "doctor": "node scripts/doctor.mjs",
-    "test": "node --test"
-  },
-  "dependencies": {
-    "yaml": "^2.5.0"
+    "setup": "node bin/job-agent.mjs init",
+    "scan": "node bin/job-agent.mjs scan",
+    "track": "node bin/job-agent.mjs track",
+    "pdf": "node bin/job-agent.mjs pdf",
+    "kb": "node bin/job-agent.mjs kb",
+    "doctor": "node bin/job-agent.mjs doctor",
+    "gen:plugins": "node scripts/gen-plugins.mjs",
+    "test": "node --test && node scripts/gen-plugins.mjs --check"
   },
   "keywords": [
     "job-search",
-    "claude-code",
-    "agent-skills",
     "resume",
-    "career"
-  ]
+    "career",
+    "interview-prep",
+    "agent-skills",
+    "mcp",
+    "claude-code",
+    "codex",
+    "cursor",
+    "copilot",
+    "gemini-cli"
+  ],
+  "bin": {
+    "job-agent": "bin/job-agent.mjs"
+  },
+  "files": [
+    "bin",
+    "scripts",
+    "templates",
+    "examples",
+    "docs",
+    "skills",
+    "AGENTS.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevin-2023-code/job-agent.git"
+  }
 }

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "trueinterview": {
+      "type": "streamable-http",
+      "url": "https://trueinterview.io/api/mcp"
+    }
+  }
+}

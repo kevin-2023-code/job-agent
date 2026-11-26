@@ -1,0 +1,20 @@
+{
+  "name": "job-agent",
+  "interface": {
+    "displayName": "job-agent"
+  },
+  "plugins": [
+    {
+      "name": "job-agent",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

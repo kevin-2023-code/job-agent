@@ -1,97 +1,122 @@
 # job-agent
 
-Turn the AI coding agent you already use (Claude Code, Codex, Cursor, Copilot, Gemini CLI) into a job-search assistant that runs in a folder on your machine.
+Open-source job-search skills for the AI agent you already use: Claude Code, Codex, Cursor, VS Code / GitHub Copilot, Gemini CLI, Windsurf, OpenCode.
 
-It scores postings against what you actually want, scans your target companies' job boards for new roles, tailors your CV to each one without inventing anything, prepares every application form for you to submit, keeps a tracker, and preps you for the interviews that follow. Your CV, notes and tracker are plain files in this folder. Nothing is uploaded anywhere unless you connect something yourself.
+Tell it what you want and it finds the roles worth your time, scores each against your goals, tailors your résumé without inventing anything, fills in the application form in your browser up to the Submit button, keeps your tracker current, finds someone to refer you, and preps you for the loop that follows.
 
 [中文说明](README.zh-CN.md)
 
-## Why
+## Install
 
-Most job-search advice comes down to: apply to fewer, better-matched roles, tailor every application, follow up, and prepare for the specific loop you're facing. All of it is tedious, which is why people skip it and spray applications instead. An agent is good at exactly this kind of tedious, careful work, as long as it knows you and is kept honest. This repo gives it the structure for both.
+One command. It finds the agents on your machine, adds the skills to each, connects the TrueInterview MCP and starts sign-in:
 
-## What it does
+```bash
+npx -y github:kevin-2023-code/job-agent install
+```
+
+Then open your agent anywhere and say **"set me up"**.
+
+<details>
+<summary>What the installer does, and options</summary>
+
+- Copies job-agent to `~/.job-agent` (the scripts the skills run) and creates your workspace `~/job-agent` (your files; never overwritten).
+- Skills go to `~/.claude/skills` (Claude Code), `~/.agents/skills` (the shared folder Codex, Cursor, Copilot, Gemini CLI and Windsurf read) and `~/.config/opencode/skills` (OpenCode).
+- For each agent it finds: copies the skills to that agent's user skills folder, and registers the MCP server at user level (with the agent's own CLI, or by merging one entry into its JSON config after saving a `.bak-job-agent` copy).
+- Signs in: runs the agent's own login where it has one (`claude mcp login`, `codex mcp login`, `opencode mcp auth`; each opens your browser), and for agents that sign in from inside the app (Cursor, VS Code, Gemini, Windsurf) opens TrueInterview once and prints the one click left.
+
+| Flag | |
+| --- | --- |
+| `--agents claude,codex,cursor,vscode,copilot,gemini,windsurf,opencode` | only these |
+| `--yes` | don't ask |
+| `--dry-run` | print every file and command, change nothing |
+| `--no-mcp` | skills only, local mode |
+| `--no-login` | register the server, sign in later |
+
+`npx -y github:kevin-2023-code/job-agent uninstall` removes the skills and the server entries; your workspace stays.
+</details>
+
+<details>
+<summary>Prefer your agent's plugin system?</summary>
+
+This repo is a plugin marketplace too. Each plugin bundles the skills and the MCP server.
+
+| Agent | |
+| --- | --- |
+| Claude Code | `claude plugin marketplace add kevin-2023-code/job-agent` then `claude plugin install job-agent@job-agent` |
+| Codex | `codex plugin marketplace add kevin-2023-code/job-agent`, then install `job-agent` from the plugin list |
+| Copilot CLI | `copilot plugin marketplace add kevin-2023-code/job-agent` then `copilot plugin install job-agent@job-agent` |
+| Cursor | Settings → Plugins → add marketplace `kevin-2023-code/job-agent` |
+| Gemini CLI | `gemini extensions install https://github.com/kevin-2023-code/job-agent` |
+
+Or clone it and open the folder: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` and the project MCP configs (`.mcp.json`, `.cursor/`, `.vscode/`, `.gemini/`, `.codex/`) are all in place.
+</details>
+
+## How it works
+
+Two modes, and every skill works in both:
+
+- **Connected.** With the [TrueInterview](https://trueinterview.io) MCP signed in, the agent gets live postings across companies ranked for you, how each company actually interviews (rounds, topics, recently reported questions), fit scores, your résumé and saved answers, every application form read and answered from your records, and a tracker shared with the website. A free account works.
+- **Local.** Without it, everything runs from your own files: résumé, preferences, a `knowledge/` folder of your interview notes and research, and the public Greenhouse, Lever, Ashby and SmartRecruiters boards of the companies you list.
+
+The agent checks which mode it's in and never stops because the server is missing. [`docs/data-sources.md`](docs/data-sources.md) has the details, including what is sent where.
+
+## Skills
 
 | You say | Skill | What happens |
 | --- | --- | --- |
-| "Set me up" + your résumé | `job-setup` | Builds `profile/cv.md`, your targets and deal-breakers, draft STAR stories, and the list of companies to watch |
-| "Is this worth applying to?" + a link | `job-evaluate` | A–F grade on six weighted dimensions, every must-have mapped to a line of your CV, gaps, red flags, and a 2-minute report in `reports/` |
-| "Anything new?" | `job-scan` | Reads the public Greenhouse, Lever, Ashby and SmartRecruiters boards of your companies, filters by title, location and age, drops what you've seen, triages the rest |
-| "Tailor my CV for this" | `job-tailor` | A tailored copy of your CV, with every change shown for approval, rendered to PDF; a cover letter when one is wanted |
-| "Help me apply" | `job-apply` | Reads the form, answers each field from your profile, drafts the open questions, and hands you an answer sheet. You press Submit |
-| "Stripe wants a screen next week" | `job-track` | Updates the tracker, sets follow-ups, and gives you honest numbers on what's working |
-| "Prep me for the onsite" | `job-prep` | The loop round by round, likely questions, a day-by-day plan, story-to-question map, and mock interviews with real feedback |
+| "Set me up" + your résumé | `job-setup` | Résumé, targets, deal-breakers, work authorization and companies to watch on record; STAR stories drafted |
+| "Find me roles" / "anything new?" | `job-scan` | Ranked roles across companies plus new postings at your watch list, screened and triaged in one table |
+| "Is this worth it?" + a link | `job-evaluate` | A–F grade on six weighted dimensions, every must-have mapped to your résumé, the company's interview record, a two-minute report |
+| "Tailor my résumé" | `job-tailor` | A tailored résumé (and letter) with every change shown, nothing invented, as an upload-ready PDF |
+| "Apply to this" | `job-apply` | Every field answered from your records, open questions drafted, the form filled in your browser and the résumé attached. You review and press Submit |
+| "I heard back from…" | `job-track` | Tracker updated, follow-ups drafted, honest weekly numbers |
+| "Prep me for the onsite" | `job-prep` | The loop round by round, a day-by-day plan with practice links, story map, mock interviews with real feedback |
+| "Who can refer me at…?" | `job-outreach` | The right two or three people and a short note for you to send |
 
 ## What it won't do
 
-- Invent anything about you. Every line it writes traces to your files or to what you told it.
-- Submit an application, send an email, or message anyone. It drafts; you send.
-- Sign in, create accounts, handle passwords, or solve CAPTCHAs.
-- Answer self-identification questions for you.
+- Invent anything about you.
+- Press the final Submit, send an email, or message anyone. It drafts and fills; you send.
+- Sign in for you, create accounts, handle passwords, or solve CAPTCHAs.
+- Answer self-identification questions unless you've told it to decline them.
 
-These rules live in [`AGENTS.md`](AGENTS.md), which every supported agent reads.
+Filling forms needs a browser tool in your agent; [`docs/browser.md`](docs/browser.md) has a one-line setup for each. Without one, you get an answer sheet to paste from.
 
-## Quick start
-
-Needs Node 18+ and an agent that can read files and run commands.
-
-```bash
-git clone https://github.com/kevin-2023-code/job-agent.git
-cd job-agent
-npm install
-npm run setup
-```
-
-Then open the folder in your agent and say **"set me up"**, with your résumé attached or pasted. After that, paste a job link.
-
-- **Claude Code** picks up the skills in `.claude/skills/` automatically.
-- **Codex, Cursor, Copilot, Gemini CLI** read `AGENTS.md`, which points them at each skill file.
-
-## Your data
+## Your files
 
 ```
-profile/     cv.md, profile.yml, stories.md      who you are and what you want
-knowledge/   anything you drop in                interview notes, research, recruiter emails
-portals.yml  companies to scan
-data/        applications.tsv, pipeline.md       tracker and new postings
-reports/     one evaluation per posting
-output/      tailored CVs, letters, answer sheets, prep plans
+~/job-agent/
+  profile/     cv.md, profile.yml, stories.md
+  knowledge/   interview notes, research, recruiter emails, reviews
+  portals.yml  companies whose job boards to watch
+  data/        local tracker, new postings
+  reports/     one evaluation per posting
+  output/      tailored résumés, letters, answer sheets, prep plans
 ```
 
-All of it is git-ignored. The tracker is a TSV that opens in any spreadsheet.
-
-The agent is only as good as what it knows about you. **`knowledge/` is where the value compounds**: interview notes from past loops, a brag doc, performance reviews, what a friend told you about a team. The agent searches it before answering anything about a company or your history.
+`knowledge/` is where it compounds: the agent searches it before answering anything about a company or your history, in both modes.
 
 ## Scripts
 
-The agent runs these; you can too.
+The skills run these; so can you (`node ~/.job-agent/bin/job-agent.mjs <command>`, or `npm run <command>` in a clone).
 
 ```bash
-npm run scan                          # new postings at your companies → data/pipeline.md
-npm run scan -- --company stripe --days 7
-npm run track -- list                 # the tracker
-npm run track -- due                  # follow-ups due
-npm run track -- stats                # funnel, reply rate, outcomes by grade
-npm run pdf -- output/acme-swe/cv.md  # Markdown → HTML + PDF (uses your Chrome/Edge)
-npm run kb -- search stripe onsite    # search your knowledge base
-npm run kb -- index                   # write knowledge/INDEX.md
-npm run doctor                        # check setup
+job-agent scan [--company stripe] [--days 7]   # new postings at your companies
+job-agent track list | due | stats              # local tracker
+job-agent pdf <file.md>                          # Markdown → PDF via your Chrome/Edge
+job-agent kb search stripe onsite                # search knowledge/
+job-agent doctor                                 # check setup
 ```
 
-## More data (optional)
-
-On its own, the agent knows your files, the postings and whatever web search finds. What it can't know is what other candidates saw: how a company's loop runs this year and what it asks. Build that up in `knowledge/`, or connect a data source over MCP. [`docs/data-sources.md`](docs/data-sources.md) covers both, including [TrueInterview](https://trueinterview.io) (interview reports by company, a question bank, live postings and fit scores; needs an account). Nothing in this repo requires it.
+Node 18+, no dependencies.
 
 ## Customize
 
-- **Scoring**: weights and grade bands are in [`docs/scoring.md`](docs/scoring.md). Change them to match your market.
-- **CV look**: [`templates/cv.html`](templates/cv.html) is plain HTML and CSS.
-- **Workflows**: each skill is one Markdown file in `.claude/skills/`. Edit it like a prompt.
-- **New job boards**: add a fetcher to [`scripts/lib/boards.mjs`](scripts/lib/boards.mjs).
+Scoring weights: [`docs/scoring.md`](docs/scoring.md). Résumé look: [`templates/cv.html`](templates/cv.html). Workflows: one Markdown file per skill in [`skills/`](skills). New job boards: [`scripts/lib/boards.mjs`](scripts/lib/boards.mjs). After editing skills or `AGENTS.md`, run `npm run gen:plugins`.
 
 ## Contributing
 
-Issues and pull requests welcome, especially new ATS fetchers, CV templates, and skill improvements that come from real searches. Run `npm test` before opening a PR.
+Issues and pull requests welcome: ATS fetchers, résumé templates, installer support for more agents, and skill changes that come from real searches. `npm test` before a PR.
 
 ## License
 

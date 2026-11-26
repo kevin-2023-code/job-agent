@@ -2,7 +2,7 @@
 // Check that job-agent is ready to use.
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { p, PATHS, readYaml } from './lib/paths.mjs';
+import { pkg, PATHS, WORKSPACE, readYaml } from './lib/paths.mjs';
 
 let problems = 0;
 const ok = (m) => console.log(`  ok    ${m}`);
@@ -13,10 +13,10 @@ console.log('job-agent doctor\n');
 
 const [major] = process.versions.node.split('.').map(Number);
 major >= 18 ? ok(`Node ${process.versions.node}`) : bad(`Node ${process.versions.node}: needs 18 or newer`);
-existsSync(p('node_modules', 'yaml')) ? ok('dependencies installed') : bad('run `npm install`');
+ok(`workspace ${WORKSPACE}`);
 
 const profile = existsSync(PATHS.profile) ? readYaml(PATHS.profile) : null;
-if (!profile) bad('profile/profile.yml missing: run `npm run setup`');
+if (!profile) warn('no local profile/profile.yml (fine when TrueInterview is connected; else run `job-agent init`)');
 else {
   if (profile.name === 'Alex Chen') warn('profile/profile.yml still holds the example person: ask your agent to "set me up"');
   else ok(`profile for ${profile.name ?? '(no name)'}`);
@@ -24,7 +24,7 @@ else {
   if (!profile.work_authorization?.status) warn('work_authorization.status is empty: forms always ask');
 }
 
-if (!existsSync(PATHS.cv)) bad('profile/cv.md missing');
+if (!existsSync(PATHS.cv)) warn('no local profile/cv.md (fine when your résumé is on TrueInterview)');
 else if (readFileSync(PATHS.cv, 'utf8').includes('Acme Analytics')) warn('profile/cv.md is still the example CV');
 else ok('profile/cv.md');
 
@@ -37,13 +37,14 @@ else ok(`portals.yml: ${(portals.companies ?? []).length} companies`);
 const kb = existsSync(PATHS.knowledge) ? readdirSync(PATHS.knowledge).filter((f) => !f.startsWith('.') && f !== 'README.md' && f !== 'INDEX.md') : [];
 kb.length ? ok(`knowledge/: ${kb.length} item(s)`) : warn('knowledge/ is empty: interview notes and research make every answer better');
 
-existsSync(PATHS.tracker) ? ok('data/applications.tsv') : warn('no tracker yet: created on first `npm run track -- add`');
+existsSync(PATHS.tracker) ? ok('data/applications.tsv') : warn('no tracker yet: created on first `job-agent track add` (not needed when TrueInterview is connected)');
 
 const chrome = ['ProgramFiles', 'ProgramFiles(x86)', 'LOCALAPPDATA'].some((k) => process.env[k] && (
   existsSync(`${process.env[k]}\\Google\\Chrome\\Application\\chrome.exe`) || existsSync(`${process.env[k]}\\Microsoft\\Edge\\Application\\msedge.exe`)))
   || ['/Applications/Google Chrome.app', '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser'].some(existsSync)
-  || existsSync(p('node_modules', 'playwright')) || Boolean(process.env.CHROME_PATH);
-chrome ? ok('PDF backend found') : warn('no Chrome/Edge/Playwright found: `npm run pdf` will only write HTML');
+  || existsSync(pkg('node_modules', 'playwright')) || Boolean(process.env.CHROME_PATH);
+chrome ? ok('PDF backend found') : warn('no Chrome/Edge/Playwright found: `job-agent pdf` will only write HTML');
 
+console.log("\nTrueInterview: these scripts can't see your agent's MCP connection; ask your agent to call get_account.");
 console.log(problems ? `\n${problems} thing(s) to fix.` : '\nReady.');
 process.exit(problems ? 1 : 0);

@@ -1,27 +1,43 @@
 import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { readFileSync, existsSync } from 'node:fs';
-import YAML from 'yaml';
+import { homedir } from 'node:os';
+import { parseYaml } from './yaml-lite.mjs';
 
-export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const p = (...parts) => join(ROOT, ...parts);
+// Where job-agent itself is installed (a clone, a plugin cache, or an npx copy).
+export const PKG_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+export const pkg = (...parts) => join(PKG_ROOT, ...parts);
+
+const isWorkspace = (dir) => existsSync(join(dir, 'profile')) || existsSync(join(dir, 'portals.yml'));
+
+// Where the candidate's files live. In order: $JOB_AGENT_HOME, the current folder if it
+// already is a workspace, the job-agent folder itself if it is one (a clone), ~/job-agent.
+export function resolveWorkspace(env = process.env, cwd = process.cwd()) {
+  if (env.JOB_AGENT_HOME) return resolve(env.JOB_AGENT_HOME);
+  if (isWorkspace(cwd)) return resolve(cwd);
+  if (isWorkspace(PKG_ROOT)) return PKG_ROOT;
+  return join(homedir(), 'job-agent');
+}
+
+export const WORKSPACE = resolveWorkspace();
+export const ws = (...parts) => join(WORKSPACE, ...parts);
 
 export const PATHS = {
-  profile: p('profile', 'profile.yml'),
-  cv: p('profile', 'cv.md'),
-  stories: p('profile', 'stories.md'),
-  portals: p('portals.yml'),
-  tracker: p('data', 'applications.tsv'),
-  pipeline: p('data', 'pipeline.md'),
-  seen: p('data', 'seen.json'),
-  knowledge: p('knowledge'),
-  reports: p('reports'),
-  output: p('output'),
+  profile: ws('profile', 'profile.yml'),
+  cv: ws('profile', 'cv.md'),
+  stories: ws('profile', 'stories.md'),
+  portals: ws('portals.yml'),
+  tracker: ws('data', 'applications.tsv'),
+  pipeline: ws('data', 'pipeline.md'),
+  seen: ws('data', 'seen.json'),
+  knowledge: ws('knowledge'),
+  reports: ws('reports'),
+  output: ws('output'),
 };
 
 export function readYaml(file) {
   if (!existsSync(file)) return null;
-  return YAML.parse(readFileSync(file, 'utf8')) ?? {};
+  return parseYaml(readFileSync(file, 'utf8')) ?? {};
 }
 
 export function today() {

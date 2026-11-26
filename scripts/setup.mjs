@@ -2,18 +2,18 @@
 // Create your working files from the examples. Never overwrites anything.
 
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { p, PATHS } from './lib/paths.mjs';
+import { pkg, ws, PATHS, WORKSPACE } from './lib/paths.mjs';
 import { COLUMNS } from './lib/tracker.mjs';
 
 const copies = [
-  [p('examples', 'profile.example.yml'), PATHS.profile],
-  [p('examples', 'cv.example.md'), PATHS.cv],
-  [p('examples', 'stories.example.md'), PATHS.stories],
-  [p('examples', 'portals.example.yml'), PATHS.portals],
-  [p('examples', 'knowledge', 'README.md'), p('knowledge', 'README.md')],
+  [pkg('examples', 'profile.example.yml'), PATHS.profile],
+  [pkg('examples', 'cv.example.md'), PATHS.cv],
+  [pkg('examples', 'stories.example.md'), PATHS.stories],
+  [pkg('examples', 'portals.example.yml'), PATHS.portals],
+  [pkg('examples', 'knowledge', 'README.md'), ws('knowledge', 'README.md')],
 ];
 
-for (const dir of ['profile', 'knowledge', 'data', 'reports', 'output']) mkdirSync(p(dir), { recursive: true });
+for (const dir of ['profile', 'knowledge', 'data', 'reports', 'output']) mkdirSync(ws(dir), { recursive: true });
 
 for (const [from, to] of copies) {
   if (existsSync(to)) { console.log(`keep    ${to}`); continue; }
@@ -27,6 +27,8 @@ if (!existsSync(PATHS.tracker)) {
 }
 
 console.log(`
-Next: open this folder in your agent (Claude Code, Codex, Cursor…) and say
-  "set me up" — it will turn your résumé into profile/cv.md and fill profile/profile.yml.
-The files above still hold the example person until then.`);
+Workspace: ${WORKSPACE}
+
+Next: in your agent (Claude Code, Codex, Cursor, Copilot, Gemini…) say "set me up".
+With TrueInterview connected, your résumé and preferences are saved to your account;
+otherwise the agent fills profile/ here. The files above hold an example person until then.`);

@@ -31,4 +31,4 @@ Check `deal_breakers` first. Any hit caps the grade at **D**, whatever the total
 
 ## Calibration
 
-After about 20 applications, compare grades with outcomes (`npm run track -- stats` shows replies by grade). If C roles reply as often as B, the weights are off for this candidate's market: say so and suggest which dimension to reweigh. The candidate edits this file if they agree.
+After about 20 applications, compare grades with outcomes (`job-agent track stats` shows replies by grade). If C roles reply as often as B, the weights are off for this candidate's market: say so and suggest which dimension to reweigh. The candidate edits this file if they agree.

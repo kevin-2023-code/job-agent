@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "trueinterview": { "type": "http", "url": "https://trueinterview.io/api/mcp" }
+  }
+}
