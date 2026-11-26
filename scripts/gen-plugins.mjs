@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const HARNESSES = ['claude', 'codex', 'cursor', 'copilot'];
-const COPY_DIRS = ['skills', 'bin', 'scripts', 'templates', 'examples', 'docs'];
+const COPY_DIRS = ['skills', 'bin', 'scripts', 'templates', 'examples', 'docs', 'assets'];
 const SKIP = new Set(['scripts/gen-plugins.mjs']);
 
 const src = JSON.parse(readFileSync(join(ROOT, 'distribution', 'plugin.source.json'), 'utf8'));
@@ -56,7 +56,7 @@ function manifests(h) {
   switch (h) {
     case 'claude':
       return {
-        '.claude-plugin/plugin.json': { $schema: 'https://json.schemastore.org/claude-code-plugin-manifest.json', ...base() },
+        '.claude-plugin/plugin.json': { $schema: 'https://json.schemastore.org/claude-code-plugin-manifest.json', ...base(), icon: './assets/logo.png' },
         '.mcp.json': { mcpServers: { [server]: { type: 'http', url } } },
       };
     case 'codex':
@@ -73,14 +73,19 @@ function manifests(h) {
             category: 'Productivity',
             capabilities: ['Read', 'Write'],
             websiteURL: src.homepage,
+            supportURL: src.urls.support,
+            privacyPolicyURL: src.urls.privacyPolicy,
+            termsOfServiceURL: src.urls.termsOfService,
             defaultPrompt: src.defaultPrompts,
+            composerIcon: './assets/logo.svg',
+            logo: './assets/logo.png',
           },
         },
         '.mcp.json': { mcpServers: { [server]: { type: 'http', url } } },
       };
     case 'cursor':
       return {
-        '.cursor-plugin/plugin.json': base(),
+        '.cursor-plugin/plugin.json': { ...base(), logo: 'assets/logo.svg' },
         'mcp.json': { mcpServers: { [server]: { url } } },
       };
     case 'copilot':
@@ -145,7 +150,7 @@ function generate() {
     for (const abs of walk(join(ROOT, d))) {
       const rel = posix(relative(ROOT, abs));
       if (SKIP.has(rel) || rel === 'skills/job-agent/SKILL.md') continue;
-      shared.push([rel, readFileSync(abs, 'utf8')]);
+      shared.push([rel, rel.endsWith('.png') ? readFileSync(abs) : readFileSync(abs, 'utf8')]);
     }
   }
   shared.push(['skills/job-agent/SKILL.md', files.get('skills/job-agent/SKILL.md')]);
@@ -171,7 +176,9 @@ const stale = existsSync(join(ROOT, 'plugins'))
 
 for (const [p, content] of files) {
   const abs = join(ROOT, p);
-  const same = existsSync(abs) && readFileSync(abs, 'utf8').replace(/\r\n/g, '\n') === content.replace(/\r\n/g, '\n');
+  const same = existsSync(abs) && (Buffer.isBuffer(content)
+    ? readFileSync(abs).equals(content)
+    : readFileSync(abs, 'utf8').replace(/\r\n/g, '\n') === content.replace(/\r\n/g, '\n'));
   if (same) continue;
   drift++;
   if (check) { console.error(`differs: ${p}`); continue; }

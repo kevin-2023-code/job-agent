@@ -8,19 +8,41 @@
 
 ## 安装
 
-一条命令。它会找到你电脑上的 agent，给每个都装好技能、连上 TrueInterview MCP，并开始登录：
+复制一行到终端里回车，中途不需要你回答任何问题。
+
+**Windows**：打开 **PowerShell**（开始菜单里输入 PowerShell 回车），粘贴：
+
+```powershell
+irm https://raw.githubusercontent.com/kevin-2023-code/job-agent/main/install.ps1 | iex
+```
+
+**macOS / Linux**：打开 **终端（Terminal）**，粘贴：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kevin-2023-code/job-agent/main/install.sh | sh
+```
+
+已经装了 Node.js 18+ 的话，任何系统都可以用这一行：
 
 ```bash
 npx -y github:kevin-2023-code/job-agent install
 ```
 
-装完后，在任意目录打开你的 agent，说 **"帮我初始化"**。
+它会找到你电脑上所有的 AI agent（Claude Code、Codex、Cursor、VS Code / Copilot、Copilot CLI、Gemini CLI、Windsurf、OpenCode），给每个都装上技能、连上 TrueInterview，并打开登录页。装完会告诉你下一步运行哪一行，比如：
 
-- 只装某几个：`--agents claude,codex,cursor`；只看会改什么：`--dry-run`；只要技能不连服务：`--no-mcp`。
-- 卸载：`npx -y github:kevin-2023-code/job-agent uninstall`（你的个人文件会保留）。
-- 也可以用各 agent 自带的插件系统安装，或者直接 clone 仓库后打开文件夹，见英文 README。
+```bash
+claude "set me up"
+```
+
+agent 会先确认你已登录（新用户在同一个页面注册免费账号），然后读取你的简历，把它推断不出来的问题一次问完，再把简历和投递偏好保存到你的 TrueInterview 账号。之后你的任何改动（改了简历、换了偏好、投出了申请）都会在工作流程中自动上传。
+
+- 只用自己的数据、不连 TrueInterview：PowerShell 先运行 `$env:JOB_AGENT_ARGS="--local"`，终端用 `curl … | sh -s -- --local`。
+- 卸载：`npx -y github:kevin-2023-code/job-agent uninstall`（个人文件会保留）。
+- 也可以用各 agent 自带的插件系统安装，见英文 README。
 
 ## 两种模式
+
+**默认连接 TrueInterview，不会先问你**。不连也能用全部功能：
 
 - **连接模式**：登录 TrueInterview MCP 后，agent 能拿到按你匹配度排序的跨公司实时岗位；每家公司真实的面试流程、考点和近期被问到的题；匹配度评分；你的简历和常用表单答案；对每份申请表逐项读取并用你的资料作答；以及和网站同步的投递记录。免费账号就能用。
 - **本地模式**：不登录也能用。所有功能都基于你自己的文件：简历、偏好、`knowledge/` 文件夹里的面试笔记和调研，以及你列出的公司在 Greenhouse、Lever、Ashby、SmartRecruiters 上的公开招聘页。

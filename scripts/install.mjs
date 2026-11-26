@@ -2,7 +2,8 @@
 // One-stop install: the skill pack, the TrueInterview MCP and sign-in, for every agent on
 // this machine.
 //
-//   job-agent install [--agents claude,codex,...] [--yes] [--dry-run] [--no-mcp] [--no-login] [--url <mcp url>]
+//   job-agent install [--agents claude,codex,...] [--dry-run] [--local] [--no-login] [--url <mcp url>]
+// No prompts: TrueInterview is connected by default; --local skips it.
 //   job-agent uninstall [--agents ...] [--dry-run]
 //
 // What it does, in order:
@@ -24,10 +25,11 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, cop
 import { dirname, join } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { createInterface } from 'node:readline/promises';
 import { PKG_ROOT, parseArgs } from './lib/paths.mjs';
 
 const args = parseArgs(process.argv.slice(2));
+// --local: the candidate wants their own data only, no TrueInterview.
+if (args.local) args['no-mcp'] = true;
 const MODE = args._[0] === 'uninstall' ? 'uninstall' : 'install';
 const HOME = homedir();
 const WIN = platform() === 'win32';
@@ -187,7 +189,7 @@ function copyPack() {
   if (PKG_ROOT === PACK_HOME) return;
   step(`copy job-agent → ${PACK_HOME}`);
   if (DRY) return;
-  for (const d of ['bin', 'scripts', 'templates', 'examples', 'docs', 'skills']) {
+  for (const d of ['bin', 'scripts', 'templates', 'examples', 'docs', 'skills', 'assets']) {
     rmSync(join(PACK_HOME, d), { recursive: true, force: true });
     cpSync(join(PKG_ROOT, d), join(PACK_HOME, d), { recursive: true });
   }
@@ -236,13 +238,8 @@ async function chooseAgents() {
     process.exit(1);
   }
   log(`Found: ${found.map((k) => AGENTS[k].label).join(', ')}`);
-  if (args.yes || DRY || !process.stdin.isTTY || MODE === 'uninstall') return found;
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
-  const ans = (await rl.question(`${MODE === 'install' ? 'Install' : 'Remove'} for all of them? [Y/n, or a list like "claude,cursor"] `)).trim().toLowerCase();
-  rl.close();
-  if (!ans || ans === 'y' || ans === 'yes') return found;
-  if (ans === 'n' || ans === 'no') process.exit(0);
-  return ans.split(',').map((s) => s.trim()).filter((s) => AGENTS[s]);
+  // No questions: every agent found gets everything. --agents narrows it.
+  return found;
 }
 
 // ---------- main ----------
@@ -287,8 +284,12 @@ if (!args['no-mcp'] && !args['no-login'] && left.length) {
 
 log('\nDone.');
 if (left.length && !args['no-mcp']) {
-  log('\nOne step left per agent, to connect TrueInterview (skip it to stay local-only):');
+  log('\nFinish connecting TrueInterview (one step each; the agent also prompts you on first use):');
   for (const l of left) log(`  • ${l}`);
 }
-log(`\nThen open your agent anywhere and say "set me up".`);
+const first = ['claude', 'codex', 'gemini', 'copilot', 'opencode'].find((k) => chosen.includes(k));
+log(`\nNext: ${first ? `run   ${first} "set me up"   (or open any of your agents and say "set me up")` : 'open your agent and say "set me up"'}.`);
+log(args['no-mcp']
+  ? 'It builds your profile from your résumé in your local workspace.'
+  : 'It signs you in if needed, then saves your résumé and application preferences to your TrueInterview account.');
 log(`Your files: ${WORKSPACE}    Remove everything: npx -y github:kevin-2023-code/job-agent uninstall`);

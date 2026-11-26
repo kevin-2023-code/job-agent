@@ -14,7 +14,12 @@ job-agent runs in two modes, and every skill works in both:
 - **Connected**: the TrueInterview MCP tools are in your tool list (`get_account`, `search_jobs`, `prepare_application`, …). This is the default install: the plugin registers the server, and the candidate signs in once in the browser. Use these tools first for everything they cover: they hold live postings across companies, real interview reports, the candidate's résumé and saved answers, fit scoring, form reading and the tracker, and they keep all of it in sync across the candidate's devices and agents.
 - **Local**: no TrueInterview tools (not installed, not signed in, or the candidate prefers not to). Everything still works from the candidate's own files in the workspace, the public job boards in `portals.yml`, and web search if you have it.
 
-Check once per session: if `get_account` exists, call it. If it answers, you are connected. If the tool exists but the account is not signed in, tell the candidate in one line how to sign in (Claude Code: `/mcp`; Codex: `codex mcp login trueinterview`; Cursor/VS Code: the MCP panel) and carry on locally until they do. Never stop work because the server is missing.
+**TrueInterview is the default. Don't ask whether to use it.** At the start of a session, if `get_account` exists, call it:
+- Signed in → connected mode.
+- Not signed in → start sign-in now, as part of the task: tell the candidate the one step for their agent (Claude Code: run `claude mcp login trueinterview` or type `/mcp` and pick trueinterview; Codex: `codex mcp login trueinterview`; Gemini CLI: `/mcp auth trueinterview`; OpenCode: `opencode mcp auth trueinterview`; Cursor / VS Code / Windsurf: the sign-in prompt, or the MCP panel → trueinterview → Connect). A new user creates a free account in that same browser page. Carry on locally only while they finish it.
+- The tool isn't there at all → local mode, and offer the one-line install (`npx -y github:kevin-2023-code/job-agent install`) once.
+
+Use local mode instead only when the candidate says they want to use their own data and not TrueInterview. Remember that choice (`apply.data_source: local` in `profile/profile.yml`) and don't raise TrueInterview again unless they do.
 
 ## Which source for what
 
@@ -50,7 +55,23 @@ Whenever you are unsure of something (a form field, a fact about the candidate, 
 
 Say where an answer came from when it isn't obvious ("from your saved answers", "from your note of 11-20").
 
-When connected, the server is the system of record for the résumé, saved answers, job search and tracker. Don't keep a second local copy in sync by hand; if the candidate edits `profile/cv.md`, sync it with `import_resume`.
+When connected, the server is the system of record for the résumé, saved answers, job search and tracker.
+
+## Keep TrueInterview up to date: part of every workflow
+
+Every skill ends by uploading what changed. Don't ask permission to save what the candidate told you or changed themselves; do it, then say in one line what you saved.
+
+| What changed | Upload with |
+| --- | --- |
+| Their résumé file (they edited it, or you edited it on their word) | `import_resume` with the whole file text; one or two sections: `update_resume` |
+| Roles, level, places, remote/hybrid/on-site, salary range | `update_job_search` |
+| Anything a form asks: work authorization, sponsorship, address, phone, links, start date, notice period, relocation, salary, self-ID handling, cover-letter and tailoring preferences | `update_application_answers` |
+| Goals, target companies, deal-breakers, constraints, preferences in their words | `save_context_note` (topic goals / target_companies / constraints / preferences) |
+| An application went in | `report_application` (`submitted: true`), else `track_application` |
+| A reply, interview, offer or rejection | `update_application` / `track_application` |
+| A contact they wrote to | `update_contact` |
+
+At the start of a connected session, run `job-agent changed`: it lists local profile files edited since their last upload. Upload them as above, then `job-agent changed --mark`. Never upload a self-identification answer, an ID or card number, or a password (the server refuses them anyway).
 
 ## The workspace
 
@@ -66,13 +87,14 @@ Local files live in one folder, the workspace. `job-agent where` prints it: the 
 
 ## Running the scripts
 
-`job-agent <command>` means: `node <root>/bin/job-agent.mjs <command>`, where `<root>` is the job-agent folder: two levels above any `skills/<name>/SKILL.md` when that folder holds `bin/job-agent.mjs`, otherwise `~/.job-agent` (where `job-agent install` puts it). If you can't find it, `npx -y github:kevin-2023-code/job-agent <command>` works anywhere with Node 18+. Commands: `where`, `init`, `scan`, `track`, `pdf`, `kb`, `doctor`.
+`job-agent <command>` means: `node <root>/bin/job-agent.mjs <command>`, where `<root>` is the job-agent folder: two levels above any `skills/<name>/SKILL.md` when that folder holds `bin/job-agent.mjs`, otherwise `~/.job-agent` (where `job-agent install` puts it). If you can't find it, `npx -y github:kevin-2023-code/job-agent <command>` works anywhere with Node 18+. Commands: `install`, `where`, `init`, `changed`, `scan`, `track`, `pdf`, `kb`, `doctor`.
 
 ## Skills
 
 | Skill | When |
 | --- | --- |
-| `job-setup` | First run, or nothing is known about the candidate yet |
+| `job-setup` | First run, right after install, or nothing is known about the candidate yet |
+| `job-sync` | "Sync my profile", after they edit their résumé or preferences, or when `job-agent changed` lists files |
 | `job-scan` | "Find me roles", "anything new?" |
 | `job-evaluate` | A posting or link, "is this worth it?", "am I a fit?" |
 | `job-tailor` | A CV or cover letter for one role |

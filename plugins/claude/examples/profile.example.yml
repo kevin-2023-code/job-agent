@@ -47,6 +47,7 @@ work_authorization:
   earliest_start: ""
 
 apply:
+  data_source: trueinterview   # trueinterview (default) | local (your own files only)
   fill_forms: true             # the agent fills application forms in your browser and stops before Submit
   voluntary_disclosures: decline   # decline (pick the form's decline option) | ask_each_time
   cover_letter: when_asked     # always | when_asked | never

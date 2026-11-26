@@ -8,52 +8,75 @@ Tell it what you want and it finds the roles worth your time, scores each agains
 
 ## Install
 
-One command. It finds the agents on your machine, adds the skills to each, connects the TrueInterview MCP and starts sign-in:
+Copy one line into a terminal and press Enter. It needs no answers from you.
+
+**Windows**: open **PowerShell** (Start menu → type "PowerShell" → Enter), paste:
+
+```powershell
+irm https://raw.githubusercontent.com/kevin-2023-code/job-agent/main/install.ps1 | iex
+```
+
+**macOS / Linux**: open **Terminal**, paste:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kevin-2023-code/job-agent/main/install.sh | sh
+```
+
+Already have Node.js 18+? This one line works on any system:
 
 ```bash
 npx -y github:kevin-2023-code/job-agent install
 ```
 
-Then open your agent anywhere and say **"set me up"**.
+It finds every AI agent on your machine (Claude Code, Codex, Cursor, VS Code / Copilot, Copilot CLI, Gemini CLI, Windsurf, OpenCode), adds the skills to each, connects TrueInterview and opens the sign-in page. When it finishes it prints the next line to run, for example:
+
+```bash
+claude "set me up"
+```
+
+The agent signs you in if you aren't yet (new users create a free account on the same page), reads your résumé, asks the few things it can't work out in one message, and saves your résumé and application preferences to your account. From then on, every change you make (an edited résumé, a new preference, an application sent) is uploaded as part of the work.
 
 <details>
-<summary>What the installer does, and options</summary>
+<summary>What exactly it changes, options, uninstall</summary>
 
-- Copies job-agent to `~/.job-agent` (the scripts the skills run) and creates your workspace `~/job-agent` (your files; never overwritten).
+- Installs Node.js if it's missing (winget on Windows, Homebrew on macOS).
+- Copies job-agent to `~/.job-agent` and creates your workspace `~/job-agent` (your files; never overwritten).
 - Skills go to `~/.claude/skills` (Claude Code), `~/.agents/skills` (the shared folder Codex, Cursor, Copilot, Gemini CLI and Windsurf read) and `~/.config/opencode/skills` (OpenCode).
-- For each agent it finds: copies the skills to that agent's user skills folder, and registers the MCP server at user level (with the agent's own CLI, or by merging one entry into its JSON config after saving a `.bak-job-agent` copy).
-- Signs in: runs the agent's own login where it has one (`claude mcp login`, `codex mcp login`, `opencode mcp auth`; each opens your browser), and for agents that sign in from inside the app (Cursor, VS Code, Gemini, Windsurf) opens TrueInterview once and prints the one click left.
+- Registers the TrueInterview MCP server (`https://trueinterview.io/api/mcp`) at user level in each agent, with the agent's own CLI or by merging one entry into its JSON config after saving a `.bak-job-agent` copy.
+- Signs in with the agent's own login where it has one (`claude mcp login`, `codex mcp login`, `opencode mcp auth`; each opens your browser). Cursor, VS Code, Gemini CLI and Windsurf ask on first use; the installer prints the one click for each.
 
-| Flag | |
+| Option (add after `install`) | |
 | --- | --- |
-| `--agents claude,codex,cursor,vscode,copilot,gemini,windsurf,opencode` | only these |
-| `--yes` | don't ask |
+| `--local` | use only your own files, no TrueInterview |
+| `--agents claude,codex` | only these agents |
 | `--dry-run` | print every file and command, change nothing |
-| `--no-mcp` | skills only, local mode |
-| `--no-login` | register the server, sign in later |
+| `--no-login` | connect now, sign in later |
 
-`npx -y github:kevin-2023-code/job-agent uninstall` removes the skills and the server entries; your workspace stays.
+With the one-line installers: PowerShell `$env:JOB_AGENT_ARGS="--local"; irm … | iex`, Terminal `curl … | sh -s -- --local`.
+
+Uninstall: `npx -y github:kevin-2023-code/job-agent uninstall` (skills and server entries go; your workspace stays).
 </details>
 
 <details>
-<summary>Prefer your agent's plugin system?</summary>
+<summary>Install as a plugin instead</summary>
 
-This repo is a plugin marketplace too. Each plugin bundles the skills and the MCP server.
+Each plugin bundles the skills and the TrueInterview MCP server.
 
-| Agent | |
-| --- | --- |
-| Claude Code | `claude plugin marketplace add kevin-2023-code/job-agent` then `claude plugin install job-agent@job-agent` |
-| Codex | `codex plugin marketplace add kevin-2023-code/job-agent`, then install `job-agent` from the plugin list |
-| Copilot CLI | `copilot plugin marketplace add kevin-2023-code/job-agent` then `copilot plugin install job-agent@job-agent` |
-| Cursor | Settings → Plugins → add marketplace `kevin-2023-code/job-agent` |
-| Gemini CLI | `gemini extensions install https://github.com/kevin-2023-code/job-agent` |
+| Agent | Where to run | Command |
+| --- | --- | --- |
+| Claude Code | terminal | `claude plugin marketplace add kevin-2023-code/job-agent && claude plugin install job-agent@job-agent` |
+| Codex | terminal | `codex plugin marketplace add kevin-2023-code/job-agent`, then install `job-agent` from `/plugins` |
+| Copilot CLI | terminal | `copilot plugin marketplace add kevin-2023-code/job-agent && copilot plugin install job-agent@job-agent` |
+| VS Code | settings.json | `"chat.plugins.marketplaces": ["kevin-2023-code/job-agent"]` |
+| Cursor | Settings → Plugins | add marketplace `kevin-2023-code/job-agent`, install `job-agent` |
+| Gemini CLI | terminal | `gemini extensions install https://github.com/kevin-2023-code/job-agent` |
 
-Or clone it and open the folder: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` and the project MCP configs (`.mcp.json`, `.cursor/`, `.vscode/`, `.gemini/`, `.codex/`) are all in place.
+Or clone the repo and open the folder in your agent: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` and the project MCP configs are in place.
 </details>
 
 ## How it works
 
-Two modes, and every skill works in both:
+**TrueInterview is the default** and connects without asking. Every skill also works without it:
 
 - **Connected.** With the [TrueInterview](https://trueinterview.io) MCP signed in, the agent gets live postings across companies ranked for you, how each company actually interviews (rounds, topics, recently reported questions), fit scores, your résumé and saved answers, every application form read and answered from your records, and a tracker shared with the website. A free account works.
 - **Local.** Without it, everything runs from your own files: résumé, preferences, a `knowledge/` folder of your interview notes and research, and the public Greenhouse, Lever, Ashby and SmartRecruiters boards of the companies you list.
@@ -66,7 +89,8 @@ The agent checks which mode it's in and never stops because the server is missin
 
 | You say | Skill | What happens |
 | --- | --- | --- |
-| "Set me up" + your résumé | `job-setup` | Résumé, targets, deal-breakers, work authorization and companies to watch on record; STAR stories drafted |
+| "Set me up" | `job-setup` | Signs you in, then saves your résumé, job search, every application-form answer and your goals to your account in one pass; drafts STAR stories |
+| "I updated my résumé" / "sync" | `job-sync` | Uploads whatever changed (résumé file, preferences, answers, tracker) |
 | "Find me roles" / "anything new?" | `job-scan` | Ranked roles across companies plus new postings at your watch list, screened and triaged in one table |
 | "Is this worth it?" + a link | `job-evaluate` | A–F grade on six weighted dimensions, every must-have mapped to your résumé, the company's interview record, a two-minute report |
 | "Tailor my résumé" | `job-tailor` | A tailored résumé (and letter) with every change shown, nothing invented, as an upload-ready PDF |
