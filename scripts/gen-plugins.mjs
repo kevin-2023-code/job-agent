@@ -151,6 +151,15 @@ function rootFiles() {
   };
 }
 
+// The Claude plugin ships no scripts and must not fetch code, so its overview skill
+// drops the npx fallback: the scripts are used only when installed separately.
+function claudeText(rel, content) {
+  if (rel !== 'skills/job-agent/SKILL.md') return content;
+  const from = "If you can't find it, `npx -y github:kevin-2023-code/job-agent <command>` works anywhere with Node 18+.";
+  if (!content.includes(from)) throw new Error('claudeText: npx sentence not found in the overview skill');
+  return content.replace(from, "If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly), and mention once that the one-line installer in the README adds them. Don't download or run code from anywhere else.");
+}
+
 function generate() {
   const files = new Map();
   files.set('skills/job-agent/SKILL.md', overviewSkill());
@@ -174,7 +183,7 @@ function generate() {
     for (const [rel, content] of shared) {
       if (h === 'claude' && CLAUDE_SKIP.test(rel)) continue;
       if (rel === 'docs/publishing.md') continue;
-      files.set(`plugins/${h}/${rel}`, content);
+      files.set(`plugins/${h}/${rel}`, h === 'claude' ? claudeText(rel, content) : content);
     }
     for (const [p, v] of Object.entries(manifests(h))) files.set(`plugins/${h}/${p}`, json(v));
     files.set(`plugins/${h}/README.md`, readme.replaceAll('{{AGENT}}', src.labels[h]));

@@ -100,6 +100,19 @@ The agent checks which mode it's in and never stops because the server is missin
 | "Who can refer me at…?" | `job-outreach` | The right two or three people and a short note for you to send |
 | "Give me a problem" / "mock me" | `job-practice` | What to practise next (due revision, your pipeline's companies, your weak topics), coaching with hints instead of answers, timed mock rounds, and a log of the mistakes to fix next |
 
+## Data and services
+
+What the skills talk to, and what goes there:
+
+| Service | When | What is sent |
+| --- | --- | --- |
+| TrueInterview MCP (`https://trueinterview.io/api/mcp`) | Connected mode (the default) | What you ask about (a role, a company, a form), and what you ask it to save: résumé, job-search preferences, application-form answers, notes, tracker updates. Never self-identification answers, ID or card numbers, or passwords. [Privacy policy](https://trueinterview.io/privacy) |
+| Employer application pages (in your browser) | Only when you ask it to apply to a role | The answers for that form and your résumé file, filled in for you to review; you press Submit |
+| Public job-board APIs (Greenhouse, Lever, Ashby, SmartRecruiters) | `job-agent scan` | Nothing about you: it only reads public postings for the companies in `portals.yml` |
+| GitHub (raw.githubusercontent.com, npm via npx) | Only when you run the installer | Nothing about you: it downloads job-agent |
+
+Your `knowledge/` folder, reports, stories and local files are never uploaded by job-agent. Your AI provider sees what your agent reads, under its own terms.
+
 ## What it won't do
 
 - Invent anything about you.

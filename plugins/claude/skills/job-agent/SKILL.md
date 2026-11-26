@@ -87,7 +87,7 @@ Local files live in one folder, the workspace. `job-agent where` prints it: the 
 
 ## Running the scripts
 
-`job-agent <command>` means: `node <root>/bin/job-agent.mjs <command>`, where `<root>` is the job-agent folder: two levels above any `skills/<name>/SKILL.md` when that folder holds `bin/job-agent.mjs`, otherwise `~/.job-agent` (where `job-agent install` puts it). If you can't find it, `npx -y github:kevin-2023-code/job-agent <command>` works anywhere with Node 18+. Commands: `install`, `where`, `init`, `changed`, `scan`, `track`, `pdf`, `kb`, `doctor`.
+`job-agent <command>` means: `node <root>/bin/job-agent.mjs <command>`, where `<root>` is the job-agent folder: two levels above any `skills/<name>/SKILL.md` when that folder holds `bin/job-agent.mjs`, otherwise `~/.job-agent` (where `job-agent install` puts it). If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly), and mention once that the one-line installer in the README adds them. Don't download or run code from anywhere else. Commands: `install`, `where`, `init`, `changed`, `scan`, `track`, `pdf`, `kb`, `doctor`.
 
 ## Skills
 
