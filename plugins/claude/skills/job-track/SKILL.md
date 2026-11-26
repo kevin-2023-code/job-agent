@@ -1,6 +1,6 @@
 ---
 name: job-track
-description: Keep the application tracker current and the search honest. Connected, updates the TrueInterview tracker (statuses, interview rounds and dates, notes) so it shows up on the candidate's board and drives their prep plan; local, keeps data/applications.tsv through job-agent track. Surfaces follow-ups that are due, drafts them, and gives a weekly readout from real numbers. Use for "I heard back from…", "I have an interview with…", "rejected by…", "where do I stand?", "what should I follow up on?".
+description: "Keep the application tracker current and the search honest. Connected, updates the TrueInterview tracker (statuses, interview rounds and dates, notes) so it shows up on the candidate's board and drives their prep plan; local, keeps data/applications.tsv through job-agent track. Surfaces follow-ups that are due, drafts them, and gives a weekly readout from real numbers. Use for \"I heard back from…\", \"I have an interview with…\", \"rejected by…\", \"where do I stand?\", \"what should I follow up on?\"."
 ---
 
 # Track applications

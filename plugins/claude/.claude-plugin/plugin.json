@@ -18,5 +18,15 @@
     "agent-skills",
     "mcp"
   ],
-  "icon": "./assets/logo.png"
+  "icon": "./assets/logo.png",
+  "documentationUrl": "https://github.com/kevin-2023-code/job-agent",
+  "supportUrl": "https://github.com/kevin-2023-code/job-agent/issues",
+  "privacyPolicyUrl": "https://trueinterview.io/privacy",
+  "termsOfServiceUrl": "https://trueinterview.io/terms",
+  "mcpServers": {
+    "trueinterview": {
+      "type": "http",
+      "url": "https://trueinterview.io/api/mcp"
+    }
+  }
 }

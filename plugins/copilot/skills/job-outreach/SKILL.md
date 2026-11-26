@@ -1,6 +1,6 @@
 ---
 name: job-outreach
-description: Find the right people at a company (recruiter, hiring manager, someone on the team, an alum) and draft a short, specific note the candidate sends themselves, for a referral or a question. Connected, uses the candidate's TrueInterview contacts and its public-profile people search; local, works from their own network notes in knowledge/. Use for "who can I talk to at…?", "can I get a referral at…?", "write a note to the recruiter", "message the hiring manager".
+description: "Find the right people at a company (recruiter, hiring manager, someone on the team, an alum) and draft a short, specific note the candidate sends themselves, for a referral or a question. Connected, uses the candidate's TrueInterview contacts and its public-profile people search; local, works from their own network notes in knowledge/. Use for \"who can I talk to at…?\", \"can I get a referral at…?\", \"write a note to the recruiter\", \"message the hiring manager\"."
 ---
 
 # Outreach

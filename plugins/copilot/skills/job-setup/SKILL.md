@@ -1,6 +1,6 @@
 ---
 name: job-setup
-description: First-run onboarding for job-agent, right after install. Signs the candidate in to TrueInterview (the default; no question asked), then configures their account in one pass: imports the résumé, saves the job search (roles, level, places, work mode, salary), every application-form answer (work authorization, sponsorship, address, links, start date, notice, salary, self-ID handling, cover-letter and tailoring preferences) and their goals and deal-breakers as notes, so the first application form is already answered. Also drafts STAR stories and the companies to watch. Local workspace only if they say they want their own data. Use for "set me up", "start", a first résumé, or whenever the account has no résumé or job search yet.
+description: "First-run onboarding for job-agent, right after install. Signs the candidate in to TrueInterview (the default; no question asked), then configures their account in one pass: imports the résumé, saves the job search (roles, level, places, work mode, salary), every application-form answer (work authorization, sponsorship, address, links, start date, notice, salary, self-ID handling, cover-letter and tailoring preferences) and their goals and deal-breakers as notes, so the first application form is already answered. Also drafts STAR stories and the companies to watch. Local workspace only if they say they want their own data. Use for \"set me up\", \"start\", a first résumé, or whenever the account has no résumé or job search yet."
 ---
 
 # Setup

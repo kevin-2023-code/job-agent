@@ -1,6 +1,6 @@
 ---
 name: job-scan
-description: Find roles worth the candidate's time. Connected, uses TrueInterview's ranked recommendations and live job search across companies, screens the best in one call, and adds new postings from the candidate's own watch list of company job boards; local, scans the public Greenhouse, Lever, Ashby and SmartRecruiters boards in portals.yml and the web. Drops what was seen, tracked or skipped, then triages. Use for "find me jobs", "anything new?", "scan", or a daily or weekly check.
+description: "Find roles worth the candidate's time. Connected, uses TrueInterview's ranked recommendations and live job search across companies, screens the best in one call, and adds new postings from the candidate's own watch list of company job boards; local, scans the public Greenhouse, Lever, Ashby and SmartRecruiters boards in portals.yml and the web. Drops what was seen, tracked or skipped, then triages. Use for \"find me jobs\", \"anything new?\", \"scan\", or a daily or weekly check."
 ---
 
 # Find roles

@@ -1,6 +1,6 @@
 ---
 name: job-tailor
-description: A résumé and, when wanted, a cover letter tailored to one posting, using only facts the candidate already has on record. Connected, uses TrueInterview's tailoring and cover-letter writer (checked for invented facts, returned as an upload-ready PDF) and keeps the saved résumé untouched; local, writes a tailored Markdown copy and renders it to PDF. Shows every change before use. Use for "tailor my resume", "CV for this role", "write a cover letter".
+description: "A résumé and, when wanted, a cover letter tailored to one posting, using only facts the candidate already has on record. Connected, uses TrueInterview's tailoring and cover-letter writer (checked for invented facts, returned as an upload-ready PDF) and keeps the saved résumé untouched; local, writes a tailored Markdown copy and renders it to PDF. Shows every change before use. Use for \"tailor my resume\", \"CV for this role\", \"write a cover letter\"."
 ---
 
 # Tailor a résumé and cover letter

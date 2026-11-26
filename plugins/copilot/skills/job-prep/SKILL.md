@@ -1,6 +1,6 @@
 ---
 name: job-prep
-description: Prepare the candidate for a specific interview. Connected, pulls the company's real interview record from TrueInterview (process, rounds, topic mix, recently reported questions with practice links), a prioritized practice plan from their own weak spots, and interview write-ups; local, works from their knowledge/ folder and the web. Builds a day-by-day plan to the date, maps their stories to likely behavioral questions, and runs mock rounds with honest feedback. Use for "I have an interview with…", "prep me for the onsite", "mock me", "what will they ask?".
+description: "Prepare the candidate for a specific interview. Connected, pulls the company's real interview record from TrueInterview (process, rounds, topic mix, recently reported questions with practice links), a prioritized practice plan from their own weak spots, and interview write-ups; local, works from their knowledge/ folder and the web. Builds a day-by-day plan to the date, maps their stories to likely behavioral questions, and runs mock rounds with honest feedback. Use for \"I have an interview with…\", \"prep me for the onsite\", \"mock me\", \"what will they ask?\"."
 ---
 
 # Interview prep

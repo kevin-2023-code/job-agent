@@ -1,6 +1,6 @@
 ---
 name: job-evaluate
-description: Decide whether one posting is worth applying to. Scores it A–F on six weighted dimensions against the candidate's goals, maps every must-have to evidence in their résumé, adds TrueInterview's match score and the company's real interview record when connected, and writes a two-minute report. Use when the candidate pastes a posting or link, asks "is this worth applying to?", "am I a fit?", or after a scan to go deeper on a shortlist.
+description: "Decide whether one posting is worth applying to. Scores it A–F on six weighted dimensions against the candidate's goals, maps every must-have to evidence in their résumé, adds TrueInterview's match score and the company's real interview record when connected, and writes a two-minute report. Use when the candidate pastes a posting or link, asks \"is this worth applying to?\", \"am I a fit?\", or after a scan to go deeper on a shortlist."
 ---
 
 # Evaluate a posting

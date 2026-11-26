@@ -1,6 +1,6 @@
 ---
 name: job-practice
-description: Practise for technical interviews every day: picks what to solve next (due revision, the companies in the candidate's pipeline, their weakest topics), by company, type (algorithm, system design, OOP, SQL, AI coding) or difficulty, with practice links into TrueInterview's question bank when connected; coaches without giving answers away, runs timed mock coding and design rounds, reviews their solution, and keeps a log of what they got wrong so the next session targets it. Use for "give me a problem", "what should I practise?", "daily practice", "drill me on graphs", "practise Stripe questions", "review my solution", "mock coding round".
+description: "Practise for technical interviews every day: picks what to solve next (due revision, the companies in the candidate's pipeline, their weakest topics), by company, type (algorithm, system design, OOP, SQL, AI coding) or difficulty, with practice links into TrueInterview's question bank when connected; coaches without giving answers away, runs timed mock coding and design rounds, reviews their solution, and keeps a log of what they got wrong so the next session targets it. Use for \"give me a problem\", \"what should I practise?\", \"daily practice\", \"drill me on graphs\", \"practise Stripe questions\", \"review my solution\", \"mock coding round\"."
 ---
 
 # Practice

@@ -1,6 +1,6 @@
 ---
 name: job-sync
-description: Upload the candidate's changes to their TrueInterview account so every agent, the website and the next application form see them: an edited résumé file, new or changed job-search preferences, form answers, goals and deal-breakers, and tracker updates. Finds what changed locally with job-agent changed, uploads with the matching tool, and reports what was saved. Use for "sync my profile", "I updated my resume", "I changed my mind about…", "update my preferences", or when job-agent changed lists files.
+description: "Upload the candidate's changes to their TrueInterview account so every agent, the website and the next application form see them: an edited résumé file, new or changed job-search preferences, form answers, goals and deal-breakers, and tracker updates. Finds what changed locally with job-agent changed, uploads with the matching tool, and reports what was saved. Use for \"sync my profile\", \"I updated my resume\", \"I changed my mind about…\", \"update my preferences\", or when job-agent changed lists files."
 ---
 
 # Sync to TrueInterview

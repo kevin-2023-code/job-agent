@@ -1,6 +1,6 @@
 ---
 name: job-apply
-description: Apply to a role the candidate picked, end to end. Gets every field's answer (connected, from TrueInterview's prepare_application, which reads the employer's form and fills what the candidate's records settle; local, from their profile files), drafts the open questions, then opens the form in a browser and fills it in, uploads the résumé, and stops at the final Submit for the candidate to review and press. Logs the application once they say it went in. Use for "apply to this", "fill this out", an application link, or "what do I put here?".
+description: "Apply to a role the candidate picked, end to end. Gets every field's answer (connected, from TrueInterview's prepare_application, which reads the employer's form and fills what the candidate's records settle; local, from their profile files), drafts the open questions, then opens the form in a browser and fills it in, uploads the résumé, and stops at the final Submit for the candidate to review and press. Logs the application once they say it went in. Use for \"apply to this\", \"fill this out\", an application link, or \"what do I put here?\"."
 ---
 
 # Apply to one role

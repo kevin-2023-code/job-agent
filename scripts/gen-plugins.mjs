@@ -56,8 +56,19 @@ function manifests(h) {
   switch (h) {
     case 'claude':
       return {
-        '.claude-plugin/plugin.json': { $schema: 'https://json.schemastore.org/claude-code-plugin-manifest.json', ...base(), icon: './assets/logo.png' },
-        '.mcp.json': { mcpServers: { [server]: { type: 'http', url } } },
+        // The Claude directory accepts only Markdown, JSON, YAML and images from
+        // unverified publishers, so this plugin carries no scripts (skills run
+        // them through npx) and declares the MCP server inline.
+        '.claude-plugin/plugin.json': {
+          $schema: 'https://json.schemastore.org/claude-code-plugin-manifest.json',
+          ...base(),
+          icon: './assets/logo.png',
+          documentationUrl: src.homepage,
+          supportUrl: src.urls.support,
+          privacyPolicyUrl: src.urls.privacyPolicy,
+          termsOfServiceUrl: src.urls.termsOfService,
+          mcpServers: { [server]: { type: 'http', url } },
+        },
       };
     case 'codex':
       return {
@@ -157,8 +168,14 @@ function generate() {
   shared.push(['LICENSE', readFileSync(join(ROOT, 'LICENSE'), 'utf8')]);
   const readme = readFileSync(join(ROOT, 'distribution', 'PLUGIN_README.md'), 'utf8');
 
+  // Claude directory: no scripts, no HTML, no SVG other than the icon, no maintainer docs.
+  const CLAUDE_SKIP = /^(bin|scripts|templates|examples)\/|^docs\/publishing\.md$|^assets\/logo\.svg$/;
   for (const h of HARNESSES) {
-    for (const [rel, content] of shared) files.set(`plugins/${h}/${rel}`, content);
+    for (const [rel, content] of shared) {
+      if (h === 'claude' && CLAUDE_SKIP.test(rel)) continue;
+      if (rel === 'docs/publishing.md') continue;
+      files.set(`plugins/${h}/${rel}`, content);
+    }
     for (const [p, v] of Object.entries(manifests(h))) files.set(`plugins/${h}/${p}`, json(v));
     files.set(`plugins/${h}/README.md`, readme.replaceAll('{{AGENT}}', src.labels[h]));
   }
