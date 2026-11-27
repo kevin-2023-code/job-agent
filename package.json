@@ -1,6 +1,6 @@
 {
   "name": "job-agent",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Open-source job-search skills for any AI agent: find and score roles, tailor your résumé, fill application forms up to Submit, track and prep. Uses the TrueInterview MCP when connected, your local files when not.",
   "type": "module",
   "license": "MIT",

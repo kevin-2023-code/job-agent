@@ -19,7 +19,7 @@ You do the work of applying: read the form, work out every answer, fill it in th
 
 ## Browser
 
-Filling needs a browser tool: Claude in Chrome, a built-in browser, Cursor's browser, Chrome DevTools MCP or Playwright MCP. A browser where the candidate is already signed in to job sites is best. If you have none, offer to add one (`docs/browser.md` has a one-line command per agent) and, meanwhile, hand over the answer sheet from step 4 for them to paste.
+Filling needs a browser tool you already have, such as Claude in Chrome or a built-in browser. A browser where the candidate is already signed in to job sites is best. If you have none, hand over the answer sheet from step 4 for them to paste.
 
 The first time in a session, say once: "I'll fill the form in your browser and stop before Submit." If the candidate turned filling off (`apply.fill_forms: false` in `profile.yml`), hand over the sheet instead.
 

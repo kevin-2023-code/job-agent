@@ -34,7 +34,7 @@ function walk(dir) {
 // The overview skill: AGENTS.md with skill frontmatter.
 function overviewSkill() {
   const body = readFileSync(join(ROOT, 'AGENTS.md'), 'utf8').replace(/^# job-agent\n/, '# job-agent: how to work\n');
-  return `---\nname: job-agent\ndescription: ${src.overviewDescription}\n---\n\n<!-- Generated from AGENTS.md by scripts/gen-plugins.mjs. Edit AGENTS.md instead. -->\n\n${body}`;
+  return `---\nname: job-agent\ndescription: ${JSON.stringify(src.overviewDescription)}\n---\n\n<!-- Generated from AGENTS.md by scripts/gen-plugins.mjs. Edit AGENTS.md instead. -->\n\n${body}`;
 }
 
 function base() {
@@ -153,11 +153,34 @@ function rootFiles() {
 
 // The Claude plugin ships no scripts and must not fetch code, so its overview skill
 // drops the npx fallback: the scripts are used only when installed separately.
+// The Claude directory refuses a plugin whose text tells Claude or the user to add an MCP
+// server the plugin doesn't declare, or to run code from elsewhere. The Claude build
+// therefore drops the installer and the browser-MCP setup notes.
+const CLAUDE_REWRITES = {
+  'skills/job-agent/SKILL.md': [
+    [
+      "If you can't find it, `npx -y github:kevin-2023-code/job-agent <command>` works anywhere with Node 18+.",
+      "If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly). Don't download or run code from anywhere else.",
+    ],
+    [
+      '- The tool isn\'t there at all → local mode, and offer the one-line install (`npx -y github:kevin-2023-code/job-agent install`) once.',
+      "- The tool isn't there at all → local mode.",
+    ],
+  ],
+  'skills/job-apply/SKILL.md': [
+    [
+      "Filling needs a browser tool: Claude in Chrome, a built-in browser, Cursor's browser, Chrome DevTools MCP or Playwright MCP. A browser where the candidate is already signed in to job sites is best. If you have none, offer to add one (`docs/browser.md` has a one-line command per agent) and, meanwhile, hand over the answer sheet from step 4 for them to paste.",
+      'Filling needs a browser tool you already have, such as Claude in Chrome or a built-in browser. A browser where the candidate is already signed in to job sites is best. If you have none, hand over the answer sheet from step 4 for them to paste.',
+    ],
+  ],
+};
+
 function claudeText(rel, content) {
-  if (rel !== 'skills/job-agent/SKILL.md') return content;
-  const from = "If you can't find it, `npx -y github:kevin-2023-code/job-agent <command>` works anywhere with Node 18+.";
-  if (!content.includes(from)) throw new Error('claudeText: npx sentence not found in the overview skill');
-  return content.replace(from, "If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly), and mention once that the one-line installer in the README adds them. Don't download or run code from anywhere else.");
+  for (const [from, to] of CLAUDE_REWRITES[rel] ?? []) {
+    if (!content.includes(from)) throw new Error(`claudeText: text to rewrite not found in ${rel}: ${from.slice(0, 60)}…`);
+    content = content.replace(from, to);
+  }
+  return content;
 }
 
 function generate() {
@@ -178,7 +201,7 @@ function generate() {
   const readme = readFileSync(join(ROOT, 'distribution', 'PLUGIN_README.md'), 'utf8');
 
   // Claude directory: no scripts, no HTML, no SVG other than the icon, no maintainer docs.
-  const CLAUDE_SKIP = /^(bin|scripts|templates|examples)\/|^docs\/publishing\.md$|^assets\/logo\.svg$/;
+  const CLAUDE_SKIP = /^(bin|scripts|templates|examples)\/|^docs\/(publishing|browser|data-sources)\.md$|^assets\/logo\.svg$/;
   for (const h of HARNESSES) {
     for (const [rel, content] of shared) {
       if (h === 'claude' && CLAUDE_SKIP.test(rel)) continue;

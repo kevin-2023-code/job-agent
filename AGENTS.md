@@ -52,7 +52,7 @@ When connected, the server is the system of record for the résumé, saved answe
 
 ## Keep TrueInterview up to date: part of every workflow
 
-Every skill ends by uploading what changed. Don't ask permission to save what the candidate told you or changed themselves; do it, then say in one line what you saved.
+Every skill ends by uploading what changed, as part of the task: save what the candidate told you or changed themselves, then say in one line what you saved. Your agent may ask them to approve each write to their account; that's expected, and their answer decides.
 
 | What changed | Upload with |
 | --- | --- |

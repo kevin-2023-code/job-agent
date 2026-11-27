@@ -1,6 +1,6 @@
 ---
 name: job-agent
-description: How job-agent works: connected mode (TrueInterview MCP tools) vs local mode (the candidate's own files), which source to use for each need, the workspace, how to run the job-agent scripts, and the rules every job-search skill follows. Read it once at the start of any job-search, application, tracking or interview-prep task.
+description: "How job-agent works: connected mode (TrueInterview MCP tools) vs local mode (the candidate's own files), which source to use for each need, the workspace, how to run the job-agent scripts, and the rules every job-search skill follows. Read it once at the start of any job-search, application, tracking or interview-prep task."
 ---
 
 <!-- Generated from AGENTS.md by scripts/gen-plugins.mjs. Edit AGENTS.md instead. -->
@@ -17,7 +17,7 @@ job-agent runs in two modes, and every skill works in both:
 **TrueInterview is the default. Don't ask whether to use it.** At the start of a session, if `get_account` exists, call it:
 - Signed in → connected mode.
 - Not signed in → start sign-in now, as part of the task: tell the candidate the one step for their agent (Claude Code: run `claude mcp login trueinterview` or type `/mcp` and pick trueinterview; Codex: `codex mcp login trueinterview`; Gemini CLI: `/mcp auth trueinterview`; OpenCode: `opencode mcp auth trueinterview`; Cursor / VS Code / Windsurf: the sign-in prompt, or the MCP panel → trueinterview → Connect). A new user creates a free account in that same browser page. Carry on locally only while they finish it.
-- The tool isn't there at all → local mode, and offer the one-line install (`npx -y github:kevin-2023-code/job-agent install`) once.
+- The tool isn't there at all → local mode.
 
 Use local mode instead only when the candidate says they want to use their own data and not TrueInterview. Remember that choice (`apply.data_source: local` in `profile/profile.yml`) and don't raise TrueInterview again unless they do.
 
@@ -59,7 +59,7 @@ When connected, the server is the system of record for the résumé, saved answe
 
 ## Keep TrueInterview up to date: part of every workflow
 
-Every skill ends by uploading what changed. Don't ask permission to save what the candidate told you or changed themselves; do it, then say in one line what you saved.
+Every skill ends by uploading what changed, as part of the task: save what the candidate told you or changed themselves, then say in one line what you saved. Your agent may ask them to approve each write to their account; that's expected, and their answer decides.
 
 | What changed | Upload with |
 | --- | --- |
@@ -87,7 +87,7 @@ Local files live in one folder, the workspace. `job-agent where` prints it: the 
 
 ## Running the scripts
 
-`job-agent <command>` means: `node <root>/bin/job-agent.mjs <command>`, where `<root>` is the job-agent folder: two levels above any `skills/<name>/SKILL.md` when that folder holds `bin/job-agent.mjs`, otherwise `~/.job-agent` (where `job-agent install` puts it). If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly), and mention once that the one-line installer in the README adds them. Don't download or run code from anywhere else. Commands: `install`, `where`, `init`, `changed`, `scan`, `track`, `pdf`, `kb`, `doctor`.
+`job-agent <command>` means: `node <root>/bin/job-agent.mjs <command>`, where `<root>` is the job-agent folder: two levels above any `skills/<name>/SKILL.md` when that folder holds `bin/job-agent.mjs`, otherwise `~/.job-agent` (where `job-agent install` puts it). If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly). Don't download or run code from anywhere else. Commands: `install`, `where`, `init`, `changed`, `scan`, `track`, `pdf`, `kb`, `doctor`.
 
 ## Skills
 
