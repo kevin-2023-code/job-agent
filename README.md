@@ -113,6 +113,10 @@ What the skills talk to, and what goes there:
 
 Your `knowledge/` folder, reports, stories and local files are never uploaded by job-agent. Your AI provider sees what your agent reads, under its own terms.
 
+**Another AI model writes some answers.** The TrueInterview server is run by TrueCode Technologies Inc. Its résumé reading and tailoring, cover letters, drafted form answers, fit scores and people search send your request to an AI model that writes the result: Anthropic's Claude, with DeepSeek models through OpenRouter as the fallback. Under the API terms TrueInterview uses, your inputs are not used to train those models.
+
+**People search (`find_contacts`).** Only when you ask, it looks for people at one employer you could contact about a role. Sources: Google search results for public LinkedIn profiles, fetched through Apify, and, when that finds too few, an AI model's web search (through OpenRouter) of public pages such as LinkedIn profiles, company team and careers pages, engineering blog author pages and conference talk pages. It keeps a name, a headline, the public profile link and the page it was found on, never an email address or phone number, stored only in the account of the person who searched. Legal basis (where the GDPR applies): TrueInterview's legitimate interest in helping a candidate research an employer, limited to public professional information ([privacy policy](https://trueinterview.io/privacy), sections 2(d) and 3). Anyone listed can ask to be removed by emailing kevin@trueinterview.io with the link to their profile.
+
 ## What it won't do
 
 - Invent anything about you.
