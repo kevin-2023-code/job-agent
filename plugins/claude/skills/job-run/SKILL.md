@@ -62,7 +62,7 @@ Follow `job-apply` for each role, with the résumé from step 2.
 
 ## 7. Roles you couldn't apply to
 
-Mark them, with a kind and a short reason: `update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind (connected), or `job-agent list skip <id> --kind <kind> --note "…"`. Kinds: `sign_in`, `not_a_fit`, `required_question`, `closed`, `other`.
+Mark them, with a kind and a short reason: `update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind (connected; a role not on the list is put on it), or locally `job-agent list add --company C --role R --url U --by agent` first when the role is not on the list yet, then `job-agent list skip <id> --kind <kind> --note "…"`. Kinds: `sign_in`, `not_a_fit`, `required_question`, `closed`, `other`.
 
 In the summary, name each site that needs the candidate once, not every role. When they say they signed in (or allowed it), put those roles back and work them again: `update_shortlist` with `action: "put_back"` and `kind: "sign_in"` (connected).
 

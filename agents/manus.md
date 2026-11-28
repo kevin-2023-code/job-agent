@@ -84,7 +84,7 @@ For each role, `prepare_application` gives the apply link, the résumé file and
 
 ### 7. Roles you couldn't apply to
 
-Mark them, with a kind and a short reason: `update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind. Kinds: `sign_in`, `not_a_fit`, `required_question`, `closed`, `other`.
+Mark them, with a kind and a short reason: `update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind (a role not on the list is put on it). Kinds: `sign_in`, `not_a_fit`, `required_question`, `closed`, `other`.
 
 In the summary, name each site that needs the candidate once, not every role. When they say they signed in (or allowed it), put those roles back and work them again: `update_shortlist` with `action: "put_back"` and `kind: "sign_in"` (connected).
 

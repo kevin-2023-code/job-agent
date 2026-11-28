@@ -42,8 +42,8 @@ const PACK_REWRITES = [
     'For each role, `prepare_application` gives the apply link, the résumé file and every field with its answer and status; `draft_answers` drafts open questions. Fill the form on the company site with those answers and the résumé from step 2.'],
   [/`report_application` with `submitted: true` \(connected; ([^)]*)\), or `job-agent track add[^\n]*?locally\./,
     '`report_application` with `submitted: true` ($1).'],
-  [/`update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind \(connected\), or `job-agent list skip[^`]*`\./,
-    '`update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind.'],
+  [/`update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind \(connected; a role not on the list is put on it\), or locally [^\n]*?`job-agent list skip[^`]*`\./,
+    '`update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind (a role not on the list is put on it).'],
 ];
 
 export function packRunProcedure(root = PKG_ROOT) {
