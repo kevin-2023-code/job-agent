@@ -16,7 +16,7 @@
         "text": "claude mcp remove trueinterview --scope user 2>/dev/null; claude mcp add --scope user --transport http trueinterview {{URL}} --header \"Authorization: Bearer {{KEY}}\""
       },
       "runPrompt": "Run my job search now.",
-      "note": "Runs when you ask. For a repeating run, use `/loop` inside Claude Code."
+      "note": "Runs when you ask. For a daily run, set it up as a scheduled task in the Claude desktop app (it runs while the computer is awake). It applies with Claude in Chrome (start it with `claude --chrome`) or a Playwright MCP server; Chrome uploads files up to 10 MB. Allow Claude in Chrome on the job sites so it doesn't stop to ask on each one."
     },
     {
       "id": "codex",
@@ -31,8 +31,8 @@
         "where": "Paste at the end of ~/.codex/config.toml (the Codex app and CLI share it), replacing any earlier [mcp_servers.trueinterview] block, then restart Codex.",
         "text": "[mcp_servers.trueinterview]\nurl = \"{{URL}}\"\nhttp_headers = { Authorization = \"Bearer {{KEY}}\" }"
       },
-      "runPrompt": "Run my job search now. Use the browser to apply on company sites; for a site that needs me signed in, use Chrome, and list any role waiting on a sign-in instead of dropping it.",
-      "note": "Runs when you ask. Applying needs a browser: turn on the Browser plugin in the Codex app, and the Codex Chrome extension for sites you are signed in to."
+      "runPrompt": "Run my job search now. Use the Codex Chrome extension to apply on company sites; for a site that needs me signed in, use Chrome, and list any role waiting on a sign-in instead of dropping it.",
+      "note": "Runs when you ask. It applies with the Codex Chrome extension: allow it access to file URLs so it can upload your résumé, and give it access to the job sites ahead of time. The Browser plugin can't upload files."
     },
     {
       "id": "cursor",
@@ -48,7 +48,7 @@
         "text": "{\n  \"mcpServers\": {\n    \"trueinterview\": {\n      \"url\": \"{{URL}}\",\n      \"headers\": { \"Authorization\": \"Bearer {{KEY}}\" }\n    }\n  }\n}"
       },
       "runPrompt": "Run my job search now.",
-      "note": "Runs when you ask, in a new Agent-mode chat. It applies with Cursor's own browser."
+      "note": "Runs when you ask, in a new Agent-mode chat. It applies with Cursor's own browser, which may not upload files: for a form that needs the résumé, it gets the role ready and hands it to you. Turn on auto-run for the browser tool, or it asks before every step."
     },
     {
       "id": "gemini",
@@ -64,7 +64,7 @@
         "text": "{\n  \"mcpServers\": {\n    \"trueinterview\": {\n      \"httpUrl\": \"{{URL}}\",\n      \"headers\": { \"Authorization\": \"Bearer {{KEY}}\" }\n    }\n  }\n}"
       },
       "runPrompt": "Run my job search now.",
-      "note": "Runs when you ask. Applying needs a browser MCP (see docs/browser.md)."
+      "note": "Runs when you ask. Applying needs a browser MCP (see docs/browser.md); without one it gets each role ready and you submit it."
     },
     {
       "id": "opencode",
@@ -80,7 +80,7 @@
         "text": "{\n  \"mcp\": {\n    \"trueinterview\": {\n      \"type\": \"remote\",\n      \"url\": \"{{URL}}\",\n      \"headers\": { \"Authorization\": \"Bearer {{KEY}}\" },\n      \"enabled\": true\n    }\n  }\n}"
       },
       "runPrompt": "Run my job search now.",
-      "note": "Runs when you ask. Applying needs a browser MCP (see docs/browser.md)."
+      "note": "Runs when you ask. Applying needs a browser MCP (see docs/browser.md); without one it gets each role ready and you submit it."
     },
     {
       "id": "muse",
@@ -90,8 +90,11 @@
       "schedule": "daily",
       "zone": "Pacific Time",
       "defaultTime": "9:30am",
-      "keyConfig": { "format": "secret", "where": "When Muse asks for the key in its secure credential prompt, paste it there. Never paste it into the chat." },
-      "note": "Runs in the cloud every day, even with your computer off."
+      "keyConfig": {
+        "format": "secret",
+        "where": "When Muse asks for the key in its secure credential prompt, paste it there. Never paste it into the chat."
+      },
+      "note": "Runs in the cloud every day, even with your computer off. It applies in its own cloud browser; Muse may ask you to approve a submit, and the run waits until you do."
     },
     {
       "id": "manus",
@@ -102,8 +105,11 @@
       "zone": "Pacific Time",
       "defaultTime": "9:30am",
       "cloudBrowser": true,
-      "keyConfig": { "format": "secret", "where": "Paste the key into Manus's secure credential prompt. No prompt? Settings → Connectors → TrueInterview → Edit, and add the header `Authorization` with the value `Bearer <your key>`." },
-      "note": "Runs in the cloud every day. It applies in its own cloud browser; when a site needs you signed in, it asks you to take over that browser."
+      "keyConfig": {
+        "format": "secret",
+        "where": "Paste the key into Manus's secure credential prompt. No prompt? Settings → Connectors → TrueInterview → Edit, and add the header `Authorization` with the value `Bearer <your key>`."
+      },
+      "note": "Runs in the cloud every day, using Manus credits on each run. It applies in its own cloud browser; when a site needs you signed in or shows a CAPTCHA, it asks you to take over that browser."
     },
     {
       "id": "grok",
@@ -113,8 +119,11 @@
       "schedule": "daily",
       "zone": "Pacific Time",
       "defaultTime": "9:30am",
-      "keyConfig": { "format": "secret", "where": "Paste the key into Grok's secure credential prompt. No prompt? Open the TrueInterview connector's settings and add the header `Authorization` with the value `Bearer <your key>`." },
-      "note": "Runs every day on the schedule you set up with it."
+      "keyConfig": {
+        "format": "secret",
+        "where": "Paste the key into Grok's secure credential prompt. No prompt? Open the TrueInterview connector's settings and add the header `Authorization` with the value `Bearer <your key>`."
+      },
+      "note": "Runs every day on the schedule you set up with it, in its cloud computer and browser."
     },
     {
       "id": "qwen",
@@ -129,7 +138,8 @@
         "where": "In the 千问办公 desktop app: 扩展 → 连接器 → + 添加 → 粘贴 JSON 配置, paste this and import. Turn on its 浏览器 connector too: that is how it applies on company sites.",
         "text": "{\n  \"mcpServers\": {\n    \"trueinterview\": {\n      \"type\": \"streamable-http\",\n      \"url\": \"{{URL}}\",\n      \"headers\": { \"Authorization\": \"Bearer {{KEY}}\" }\n    }\n  }\n}"
       },
-      "note": "Runs every day while your computer is on; a run is skipped while it is off or asleep."
+      "note": "Runs every day while your computer is on; a run is skipped while it is off or asleep, so turn on Keep System Awake. It applies with the 浏览器 (browser) connector in your own Chrome or Edge, so keep that browser open.",
+      "scheduleName": "scheduled task (定时任务)"
     },
     {
       "id": "workbuddy",
@@ -141,10 +151,11 @@
       "defaultTime": "9:30am",
       "keyConfig": {
         "format": "json",
-        "where": "In the WorkBuddy desktop app: Connectors → Custom connectors → + Add MCP, paste this and save, then trust TrueInterview when it asks.",
+        "where": "In the WorkBuddy desktop app: 专家·技能·连接器 → 连接器 → 自定义连接器, add it with this, save, then trust TrueInterview when it asks.",
         "text": "{\n  \"mcpServers\": {\n    \"trueinterview\": {\n      \"type\": \"http\",\n      \"url\": \"{{URL}}\",\n      \"headers\": { \"Authorization\": \"Bearer {{KEY}}\" }\n    }\n  }\n}"
       },
-      "note": "Runs every day while your computer is on; a run is skipped while it is off or asleep."
+      "note": "Runs every day while your computer is on; a run is skipped while it is off or asleep. Give the TrueInterview connector full access, or WorkBuddy asks before every call, the résumé download included.",
+      "scheduleName": "automation (自动化)"
     },
     {
       "id": "other",
@@ -154,8 +165,11 @@
       "schedule": "daily",
       "zone": "your time zone",
       "defaultTime": "9:30am",
-      "keyConfig": { "format": "secret", "where": "Add TrueInterview as a remote MCP server ({{URL}}). If it offers a sign-in, sign in; otherwise give it the key in its credential or header settings (`Authorization: Bearer <your key>`), never in the chat." },
-      "note": "Any agent that can call a remote MCP server. If it can't schedule tasks, ask it to run when you want."
+      "keyConfig": {
+        "format": "secret",
+        "where": "Add TrueInterview as a remote MCP server ({{URL}}). If it offers a sign-in, sign in; otherwise give it the key in its credential or header settings (`Authorization: Bearer <your key>`), never in the chat."
+      },
+      "note": "Any agent that can call a remote MCP server and use a browser that uploads files. If it can't schedule tasks, ask it to run when you want."
     }
   ]
 }

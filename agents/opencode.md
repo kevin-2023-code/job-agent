@@ -2,7 +2,7 @@
 
 <!-- Generated from distribution/agents.json by scripts/gen-plugins.mjs. -->
 
-Runs when you ask. Applying needs a browser MCP (see docs/browser.md).
+Runs when you ask. Applying needs a browser MCP (see docs/browser.md); without one it gets each role ready and you submit it.
 
 ## 1. Install the skills and the TrueInterview connection
 
@@ -23,7 +23,7 @@ Prefer a key, for example on a machine where the browser sign-in doesn't work? M
   "mcp": {
     "trueinterview": {
       "type": "remote",
-      "url": "https://trueinterview.io/api/mcp",
+      "url": "https://trueinterview.io/api/mcp/key",
       "headers": { "Authorization": "Bearer <your TrueInterview key>" },
       "enabled": true
     }

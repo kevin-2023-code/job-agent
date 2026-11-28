@@ -1,6 +1,6 @@
 {
   "name": "job-agent",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Open-source job-search skills for any AI agent: find and score roles, tailor your résumé, apply on company sites (submitted by your agent or left for you, as you set it), set up Muse, Manus, Qwen and other chat agents, track and prep. Uses the TrueInterview MCP when connected, your local files when not.",
   "type": "module",
   "license": "MIT",

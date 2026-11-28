@@ -6,6 +6,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { PKG_ROOT } from './paths.mjs';
 
 export const MCP_URL = 'https://trueinterview.io/api/mcp';
+// The key-only door to the same server: no OAuth discovery, so a client keeps the key header
+// instead of starting a sign-in (TrueInterview MCP 1.30). Every key config points here.
+export const KEY_MCP_URL = 'https://trueinterview.io/api/mcp/key';
 export const KEY_PLACEHOLDER = '<your TrueInterview key>';
 
 export function loadRegistry(root = PKG_ROOT) {
@@ -33,8 +36,6 @@ const PACK_REWRITES = [
   [/- Connected: `recommend_jobs` \(([^\n]*?)\), and `job-agent scan` for companies in `portals\.yml`\.\n- Local: `job-agent scan`\.\n/,
     '- `recommend_jobs` ($1), and `search_jobs` for anything specific the candidate asked for.\n'],
   ['(`match_resume_to_job` / `screen_jobs`, or `docs/scoring.md` locally)', '(`match_resume_to_job` / `screen_jobs`)'],
-  ['- Every role you look at and pass on: `skip_job` with the reason (connected) so',
-    '- Every role you look at and pass on: `skip_job` with the reason so'],
   ['`update_shortlist` with `action: "add"` (connected) or `job-agent list add --by agent --note "…"`.',
     '`update_shortlist` with `action: "add"`.'],
   ['Follow `job-apply` for each role, with the résumé from step 2.',
@@ -71,18 +72,18 @@ export function packRules(root = PKG_ROOT) {
 function connectionLines(agent, url) {
   const k = agent.keyConfig ?? {};
   if (k.format === 'secret') {
-    return `Connect to the TrueInterview MCP server at ${url}. If it offers a sign-in, use that. Otherwise it takes my TrueInterview key as a bearer token: ask me for it in your secure credential prompt, never in this chat, and never repeat it back.`;
+    return `Connect to the TrueInterview MCP server at ${url}. It takes my TrueInterview key as a bearer token in the Authorization header: ask me for it in your secure credential prompt, never in this chat, and never repeat it back. (If you can only connect with a sign-in, use ${MCP_URL} instead.)`;
   }
   return 'Use the TrueInterview connector I added for my jobs, résumé, applications and to-apply list.';
 }
 
 function scheduleLines(agent, time) {
   if (agent.schedule !== 'daily') return 'Run it when I ask.';
-  return `Then make this a daily scheduled task: every day at ${time} ${agent.zone}, run my job search with the procedure above. Run it once now so I can see it work.`;
+  return `Then make this a daily ${agent.scheduleName || 'scheduled task'}: every day at ${time} ${agent.zone}, run my job search with the procedure above. Run it once now so I can see it work.`;
 }
 
 // The one message a chat or desktop agent gets: connection, rules, run procedure, schedule.
-export function setupMessage(agent, { time, url = MCP_URL, root = PKG_ROOT } = {}) {
+export function setupMessage(agent, { time, url = KEY_MCP_URL, root = PKG_ROOT } = {}) {
   const at = time || agent.defaultTime || '9:30am';
   const parts = [
     'Set me up with job-agent, an open-source job-search assistant that works from my TrueInterview account.',
@@ -100,7 +101,7 @@ export function setupMessage(agent, { time, url = MCP_URL, root = PKG_ROOT } = {
   return parts.join('\n\n') + '\n';
 }
 
-export function keyConfigText(agent, { key = KEY_PLACEHOLDER, url = MCP_URL } = {}) {
+export function keyConfigText(agent, { key = KEY_PLACEHOLDER, url = KEY_MCP_URL } = {}) {
   const k = agent.keyConfig ?? {};
   if (!k.text) return null;
   return k.text.replaceAll('{{URL}}', url).replaceAll('{{KEY}}', key);
@@ -123,7 +124,7 @@ export function agentDoc(agent, registry, { root = PKG_ROOT } = {}) {
       lines.push(stepH('Add the TrueInterview connector'), '', `Make a key for ${agent.label} on ${registry.keyPage} (shown once). ${k.where}`, '', fence(k.format, keyConfigText(agent)), '');
     }
     lines.push(stepH('Send it the setup message'), '', `Start a new chat and send this. It carries job-agent's rules and run procedure (the skill pack), ${agent.schedule === 'daily' ? 'and sets up the daily run' : 'and runs when you ask'}. Change the time if you like.`, '');
-    if (!k.text) lines.push(`The message doesn't contain your key. ${k.where.replaceAll('{{URL}}', MCP_URL)}`, '');
+    if (!k.text) lines.push(`The message doesn't contain your key. ${k.where.replaceAll('{{URL}}', KEY_MCP_URL)}`, '');
     lines.push(fence('text', setupMessage(agent, { root }).trimEnd()), '');
   }
   lines.push(stepH('Choose how it works'), '', 'On TrueInterview, set your mode (find and apply / pick for your approval / only the roles you add), who sends, a minimum match score and applications per day. The agent reads them at the start of every run, so a change applies from the next run without a new message.', '');

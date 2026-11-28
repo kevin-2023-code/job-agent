@@ -2,7 +2,7 @@
 
 <!-- Generated from distribution/agents.json by scripts/gen-plugins.mjs. -->
 
-Runs when you ask, in a new Agent-mode chat. It applies with Cursor's own browser.
+Runs when you ask, in a new Agent-mode chat. It applies with Cursor's own browser, which may not upload files: for a form that needs the résumé, it gets the role ready and hands it to you. Turn on auto-run for the browser tool, or it asks before every step.
 
 ## 1. Install the skills and the TrueInterview connection
 
@@ -22,7 +22,7 @@ Prefer a key, for example on a machine where the browser sign-in doesn't work? M
 {
   "mcpServers": {
     "trueinterview": {
-      "url": "https://trueinterview.io/api/mcp",
+      "url": "https://trueinterview.io/api/mcp/key",
       "headers": { "Authorization": "Bearer <your TrueInterview key>" }
     }
   }
