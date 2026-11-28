@@ -2,7 +2,7 @@
 
 <!-- Generated from distribution/agents.json by scripts/gen-plugins.mjs. -->
 
-Runs when you ask. Applying needs a browser: turn on the Browser plugin in the Codex app, and the Codex Chrome extension for sites you are signed in to.
+Runs when you ask. It applies with the Codex Chrome extension: allow it access to file URLs so it can upload your résumé, and give it access to the job sites ahead of time. The Browser plugin can't upload files.
 
 ## 1. Install the skills and the TrueInterview connection
 
@@ -20,7 +20,7 @@ Prefer a key, for example on a machine where the browser sign-in doesn't work? M
 
 ```toml
 [mcp_servers.trueinterview]
-url = "https://trueinterview.io/api/mcp"
+url = "https://trueinterview.io/api/mcp/key"
 http_headers = { Authorization = "Bearer <your TrueInterview key>" }
 ```
 
@@ -28,7 +28,7 @@ Keep the key out of chats and repositories. A new key for the same agent replace
 
 ## 3. Run it
 
-Say: `Run my job search now. Use the browser to apply on company sites; for a site that needs me signed in, use Chrome, and list any role waiting on a sign-in instead of dropping it.` The `job-run` skill reads your mode and caps from your TrueInterview account each run.
+Say: `Run my job search now. Use the Codex Chrome extension to apply on company sites; for a site that needs me signed in, use Chrome, and list any role waiting on a sign-in instead of dropping it.` The `job-run` skill reads your mode and caps from your TrueInterview account each run.
 
 ## 4. Choose how it works
 

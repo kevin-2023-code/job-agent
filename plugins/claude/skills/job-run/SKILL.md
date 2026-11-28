@@ -24,6 +24,8 @@ The candidate can change them any time, so never go by an older message, includi
 | `min_match_score` | 0–100, or none | none |
 | `max_applications_per_day` | 1–20, or none | none |
 
+If you don't know whether the candidate will need visa sponsorship and their search reaches outside mainland China, ask once and save the answer (connected: `update_application_answers` with `requires_sponsorship`; local: `profile.yml`).
+
 On a **scheduled** run in `list_only`, do nothing else: tell the candidate this mode doesn't need the schedule and they can delete it (or switch modes), then stop.
 
 ## 2. Résumés
@@ -32,34 +34,37 @@ Connected: `get_resume` (and a résumé list, if the server offers one). Local: 
 
 ## 3. Find roles (`auto` and `shortlist` only)
 
-- Connected: `recommend_jobs` (on a scheduled run, pass the previous run's `checked_at` as `new_since`), and `job-agent scan` for companies in `portals.yml`.
+- Connected: `recommend_jobs` (on a scheduled run, pass `last_run_at` from `get_shortlist` as `new_since`; leave it out when it is empty), and `job-agent scan` for companies in `portals.yml`.
 - Local: `job-agent scan`.
-- Leave out what is already tracked, already on the list, or was skipped in the last 7 days.
+- Leave out what is already tracked, already on the list, or was marked could-not-apply in the last 7 days (connected, the server already leaves those out of `recommend_jobs`).
 
 ## 4. Decide fit
 
 Read each posting against the chosen résumé and the candidate's targets and deal-breakers.
 - `min_match_score` set: only roles whose match (`match_resume_to_job` / `screen_jobs`, or `docs/scoring.md` locally) reaches it.
 - Not set: judge it yourself; use a match check only when unsure.
-- Every role you look at and pass on: `skip_job` with the reason (connected) so the next run doesn't look again.
+- Every role you look at and pass on: mark it could-not-apply (step 7) with kind `not_a_fit` and the reason, so the next runs leave it out for 7 days. (`skip_job` is the candidate's own "not interested" on the board; don't use it for this.)
 
 ## 5. Act by mode
 
 - **`shortlist`:** add each pick with a one-line note in the candidate's language (what fits, any risk): `update_shortlist` with `action: "add"` (connected) or `job-agent list add --by agent --note "…"`. The server refuses past 40 picks waiting or past the daily cap; stop adding when it does. Then apply only to rows that are `approved`.
 - **`list_only`:** only the list's rows (all of them were added or approved by the candidate). Don't search.
-- **`auto`:** apply to every role that passed step 4.
+- **`auto`:** apply to every role that passed step 4. Work the to-apply list only when the candidate asks you to.
 
 ## 6. Apply, one role at a time
 
 Follow `job-apply` for each role, with the résumé from step 2.
 - `apply_by: agent`: fill the form and press Submit yourself once every required field has an honest answer. Required fields only; an optional question nobody told you the answer to can stay empty. For a required question with no answer on file, pick the neutral option the form offers (for example "Prefer not to say" or "N/A") rather than drop the role; never state a fact about the candidate that isn't on record.
 - `apply_by: me`: get the role ready (résumé file, every answer, the link) and hand it over; don't submit.
-- A sign-in, account creation, email code or CAPTCHA: you don't do these. Ask the candidate to take over, then carry on; if they don't answer, mark the role as could-not-apply with kind `sign_in` and move on.
+- The résumé file: download it to a local file and upload that in the form (connected, `prepare_application`'s `resume_file` link expires within minutes; ask for it again when it has). If your browser can't upload a file, don't submit without it: hand the role over with kind `other` and the note "needs the résumé uploaded".
+- A sign-in, account creation, email code, CAPTCHA, or your own app asking for permission to go on: you don't do these. Ask the candidate to take over, then carry on; if they don't answer, mark the role as could-not-apply with kind `sign_in` and move on.
 - After each submission: `report_application` with `submitted: true` (connected; its answer says when the daily cap is reached), or `job-agent track add … --status applied` and `job-agent list done <id>` locally. Stop applying when `max_applications_per_day` is reached.
 
 ## 7. Roles you couldn't apply to
 
-Mark them, with a kind and a short reason: `update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind (connected), or `job-agent list skip <id> --kind <kind> --note "…"`. Kinds: `sign_in`, `not_a_fit`, `required_question`, `closed`, `other`.
+Mark them, with a kind and a short reason: `update_shortlist` with `action: "could_not_apply"` and a note that starts with the kind (connected; a role not on the list is put on it), or locally `job-agent list add --company C --role R --url U --by agent` first when the role is not on the list yet, then `job-agent list skip <id> --kind <kind> --note "…"`. Kinds: `sign_in`, `not_a_fit`, `required_question`, `closed`, `other`.
+
+In the summary, name each site that needs the candidate once, not every role. When they say they signed in (or allowed it), put those roles back and work them again: `update_shortlist` with `action: "put_back"` and `kind: "sign_in"` (connected).
 
 ## 8. Summary
 

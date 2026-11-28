@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Open-source job-search skills: find and score roles, tailor your résumé, apply on company sites the way you set it (your agent submits, or stops at Submit for you), work a to-apply list on a daily schedule, track applications and prep for interviews. Uses the TrueInterview MCP for live jobs, real interview data and your saved records when you sign in, and your own local files when you don't.",
-    "version": "0.4.0"
+    "version": "0.4.1"
   },
   "plugins": [
     {
       "name": "job-agent",
       "source": "./plugins/cursor",
       "description": "Open-source job-search skills: find and score roles, tailor your résumé, apply on company sites the way you set it (your agent submits, or stops at Submit for you), work a to-apply list on a daily schedule, track applications and prep for interviews. Uses the TrueInterview MCP for live jobs, real interview data and your saved records when you sign in, and your own local files when you don't.",
-      "version": "0.4.0",
+      "version": "0.4.1",
       "category": "productivity"
     }
   ]
