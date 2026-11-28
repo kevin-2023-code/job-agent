@@ -57,11 +57,10 @@ Leave out anything already known.
 ## 7. How their agent works
 
 Ask once, with the default in brackets, and save it (connected: on TrueInterview at https://trueinterview.io/agent/start, where they choose it themselves; local: the `agent:` block in `profile/profile.yml`):
-- Mode [pick for my approval]: find and apply on its own (`auto`), find and add picks for me to approve (`shortlist`), or only the roles I add (`list_only`).
-- Who sends [me]: my agent submits (`agent`) or I press Submit (`me`).
+- Mode [pick for my approval]: find and add picks for me to approve (`shortlist`), or only the roles I add (`list_only`).
 - Minimum match score [none] and applications per day [none].
 
-On a chat or desktop agent (Muse, Manus, Grok, Qwen, WorkBuddy), `job-agent agent <id>` prints the setup message that teaches it the rules and the run, with a daily schedule.
+In Claude, the candidate always presses the final Submit; the agent fills the form and stops there, whatever `apply_by` says.
 
 ## 8. First results
 

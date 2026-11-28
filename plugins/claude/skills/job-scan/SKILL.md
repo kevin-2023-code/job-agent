@@ -15,7 +15,6 @@ description: "Find roles worth the candidate's time. Connected, uses TrueIntervi
 4. **Screen the shortlist**: `screen_jobs` with up to 10 ids and `match: true` gives facts, must-haves, fit and whether each is tracked in one call. For watch-list postings without an id, evaluate from the posting with `match_resume_to_job` (`job_description`).
 5. **Show a short table**: company, role, place, fit, one-line keep/drop reason, link. At most 15 rows; say how many more.
 6. **On their word**: `skip_job` for roles they rule out (with `why`, so similar ones stop showing up), `update_shortlist` with `action: "add"` for ones they want applied to (it puts them on their to-apply list; `track_application` with `status: "saved"` on an older server), and `job-evaluate` for the ones they want a full read on.
-7. **Running unattended** (a scheduled run, or "find and apply"): use `job-run` instead. It reads their mode first: in `shortlist` mode your picks go on the to-apply list with a one-line note for them to approve.
 
 ## Local
 

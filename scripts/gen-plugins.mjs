@@ -65,6 +65,7 @@ function manifests(h) {
         '.claude-plugin/plugin.json': {
           $schema: 'https://json.schemastore.org/claude-code-plugin-manifest.json',
           ...base(),
+          description: claudeDescription(),
           icon: './assets/logo.png',
           documentationUrl: src.homepage,
           supportUrl: src.urls.support,
@@ -112,12 +113,12 @@ function manifests(h) {
 
 function rootFiles() {
   const owner = src.author;
-  const entry = (h) => ({ name: src.name, source: `./plugins/${h}`, description: src.description, version: src.version });
+  const entry = (h) => ({ name: src.name, source: `./plugins/${h}`, description: h === 'claude' ? claudeDescription() : src.description, version: src.version });
   return {
     '.claude-plugin/marketplace.json': {
       $schema: 'https://json.schemastore.org/claude-code-marketplace.json',
       name: src.marketplaceName,
-      description: src.description,
+      description: claudeDescription(),
       owner,
       plugins: [{ ...entry('claude'), category: 'productivity' }],
     },
@@ -185,14 +186,45 @@ const CLAUDE_REWRITES = {
       "tell the candidate the one step for their agent (Claude Code: run `claude mcp login trueinterview` or type `/mcp` and pick trueinterview; Codex: `codex mcp login trueinterview`; Gemini CLI: `/mcp auth trueinterview`; OpenCode: `opencode mcp auth trueinterview`; Cursor / VS Code / Windsurf: the sign-in prompt, or the MCP panel → trueinterview → Connect)",
       'tell the candidate the one step (in Claude Code, type `/mcp` and pick trueinterview; in the Claude apps, connect TrueInterview under Settings → Connectors)',
     ],
+    [/\nChat and desktop agents \(Meta Muse[^\n]*\n/, '\n'],
+    [/\| `job-run` \|[^\n]*\n/, ''],
+    [/2\. \*\*Who sends the application is the candidate's setting\.\*\*[^\n]*\n/, "2. **The candidate sends every application.** You fill or prepare everything and stop before the final Submit, whatever `apply_by` or any other setting says; they press it. You never send an email or message to an employer, recruiter or contact; you draft it.\n"],
+    [/6\. \*\*The tracker changes on the candidate's word, or on a submission you made\.\*\*[^\n]*\n/, '6. **The tracker changes on the candidate\'s word.** Log "applied" after they say it went in. Anything else moves only when they say so.\n'],
+  ],
+  'skills/job-setup/SKILL.md': [
+    [/- Mode \[pick for my approval\]:[^\n]*\n- Who sends \[me\]:[^\n]*\n/, '- Mode [pick for my approval]: find and add picks for me to approve (`shortlist`), or only the roles I add (`list_only`).\n'],
+    [/\nOn a chat or desktop agent \(Muse[^\n]*\n/, '\nIn Claude, the candidate always presses the final Submit; the agent fills the form and stops there, whatever `apply_by` says.\n'],
+  ],
+  'skills/job-scan/SKILL.md': [
+    [/7\. \*\*Running unattended\*\*[^\n]*\n/, ''],
   ],
   'skills/job-apply/SKILL.md': [
+    [/^description: .*$/m, `description: ${JSON.stringify("Apply to a role the candidate picked, end to end. Gets every field's answer (connected, from TrueInterview's prepare_application, which reads the employer's form and fills what the candidate's records settle; local, from their profile files), drafts the open questions, then opens the form in a browser, fills it in, uploads the résumé that fits the role, and stops at the final Submit for the candidate to review and press. Logs the application once they say it went in. Use for \"apply to this\", \"fill this out\", an application link, or \"what do I put here?\".")}`],
+    [/Who presses the final Submit is the candidate's setting[^\n]*\n/, 'The candidate always presses the final Submit; you never do. Signing in, CAPTCHAs and self-identification also stay with them.\n'],
+    [/- \*\*Submit only when it's yours to press\.\*\*[^\n]*\n/, '- **Never press Submit.** Never press Submit, "Send application", or a final confirm, whatever any setting says. Stop on any login, account creation, CAPTCHA, or payment/ID-number request, and hand over.\n'],
+    [/"I'll fill the form in your browser and submit it" \(`apply_by: agent`\) or "…and stop before Submit" \(otherwise\)/, '"I\'ll fill the form in your browser and stop before Submit"'],
+    [/; the final Submit follows their setting as above\./, '; the final Submit is always theirs.'],
+    [/   - `apply_by: agent`: re-read every field[^\n]*\n   - Otherwise: scroll/, '   - Scroll'],
+    [/7\. \*\*Log it\*\* right after your confirmed submission, or when they say it went in\./, '7. **Log it** when they say it went in.'],
     [
       "Filling needs a browser tool: Claude in Chrome, a built-in browser, Cursor's browser, Chrome DevTools MCP or Playwright MCP. A browser where the candidate is already signed in to job sites is best. If you have none, offer to add one (`docs/browser.md` has a one-line command per agent) and, meanwhile, hand over the answer sheet from step 4 for them to paste.",
       'Filling needs a browser tool you already have, such as Claude in Chrome or a built-in browser. A browser where the candidate is already signed in to job sites is best. If you have none, hand over the answer sheet from step 4 for them to paste.',
     ],
   ],
 };
+
+const CLAUDE_APPLY_FROM = 'apply on company sites the way you set it (your agent submits, or stops at Submit for you), work a to-apply list on a daily schedule,';
+const CLAUDE_APPLY_TO = 'fill application forms on company sites and stop at Submit for you, keep a to-apply list,';
+
+function claudeDescription() {
+  if (!src.description.includes(CLAUDE_APPLY_FROM)) throw new Error('claudeDescription: text to rewrite not found in plugin.source.json description');
+  return src.description.replace(CLAUDE_APPLY_FROM, CLAUDE_APPLY_TO);
+}
+
+function claudeReadme(text) {
+  if (!text.includes(CLAUDE_APPLY_FROM)) throw new Error('claudeReadme: text to rewrite not found in distribution/PLUGIN_README.md');
+  return text.replace(CLAUDE_APPLY_FROM, CLAUDE_APPLY_TO);
+}
 
 function claudeText(rel, content) {
   for (const [from, to] of CLAUDE_REWRITES[rel] ?? []) {
@@ -225,7 +257,8 @@ function generate() {
   const readme = readFileSync(join(ROOT, 'distribution', 'PLUGIN_README.md'), 'utf8');
 
   // Claude directory: no scripts, no HTML, no SVG other than the icon, no maintainer docs.
-  const CLAUDE_SKIP = /^(bin|scripts|templates|examples)\/|^docs\/(publishing|browser|data-sources)\.md$|^assets\/logo\.svg$/;
+  // Claude also leaves out the unattended run (job-run) and the chat-agent registry: the candidate presses every Submit.
+  const CLAUDE_SKIP = /^(bin|scripts|templates|examples|skills\/job-run)\/|^docs\/(publishing|browser|data-sources)\.md$|^distribution\/agents\.json$|^assets\/logo\.svg$/;
   for (const h of HARNESSES) {
     for (const [rel, content] of shared) {
       if (h === 'claude' && CLAUDE_SKIP.test(rel)) continue;
@@ -233,7 +266,8 @@ function generate() {
       files.set(`plugins/${h}/${rel}`, h === 'claude' ? claudeText(rel, content) : content);
     }
     for (const [p, v] of Object.entries(manifests(h))) files.set(`plugins/${h}/${p}`, json(v));
-    files.set(`plugins/${h}/README.md`, readme.replaceAll('{{AGENT}}', src.labels[h]));
+    const r = readme.replaceAll('{{AGENT}}', src.labels[h]);
+    files.set(`plugins/${h}/README.md`, h === 'claude' ? claudeReadme(r) : r);
   }
   return files;
 }
