@@ -194,6 +194,9 @@ function copyPack() {
     cpSync(join(PKG_ROOT, d), join(PACK_HOME, d), { recursive: true });
   }
   for (const f of ['AGENTS.md', 'LICENSE', 'package.json']) copyFileSync(join(PKG_ROOT, f), join(PACK_HOME, f));
+  // `job-agent agent` reads the agent registry.
+  mkdirSync(join(PACK_HOME, 'distribution'), { recursive: true });
+  copyFileSync(join(PKG_ROOT, 'distribution', 'agents.json'), join(PACK_HOME, 'distribution', 'agents.json'));
 }
 
 const doneDirs = new Set();

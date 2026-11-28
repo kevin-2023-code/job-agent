@@ -28,6 +28,8 @@ export const PATHS = {
   stories: ws('profile', 'stories.md'),
   portals: ws('portals.yml'),
   tracker: ws('data', 'applications.tsv'),
+  applyList: ws('data', 'apply-list.tsv'),
+  resumes: ws('profile', 'resumes'),
   pipeline: ws('data', 'pipeline.md'),
   seen: ws('data', 'seen.json'),
   knowledge: ws('knowledge'),

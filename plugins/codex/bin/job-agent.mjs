@@ -6,6 +6,8 @@
 //   init      create the workspace from the examples (never overwrites)
 //   scan      new postings at the companies in portals.yml
 //   track     the local application tracker
+//   list      the local to-apply list
+//   agent     setup steps and the setup message for one agent
 //   pdf       Markdown CV or letter → HTML + PDF
 //   kb        search or index knowledge/
 //   doctor    check the setup
@@ -14,7 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { PKG_ROOT, WORKSPACE } from '../scripts/lib/paths.mjs';
 
-const COMMANDS = { changed: 'changed.mjs', install: 'install.mjs', uninstall: 'install.mjs', init: 'setup.mjs', setup: 'setup.mjs', scan: 'scan.mjs', track: 'track.mjs', pdf: 'cv-pdf.mjs', kb: 'kb.mjs', doctor: 'doctor.mjs' };
+const COMMANDS = { changed: 'changed.mjs', install: 'install.mjs', uninstall: 'install.mjs', init: 'setup.mjs', setup: 'setup.mjs', scan: 'scan.mjs', track: 'track.mjs', list: 'apply-list.mjs', agent: 'agent-setup.mjs', pdf: 'cv-pdf.mjs', kb: 'kb.mjs', doctor: 'doctor.mjs' };
 const [cmd, ...rest] = process.argv.slice(2);
 
 if (cmd === 'where') {
@@ -32,6 +34,8 @@ if (cmd === 'where') {
   init      create the workspace from the examples (never overwrites)
   scan      new postings at the companies in portals.yml
   track     the local application tracker (list, find, add, set, note, due, stats)
+  list      the to-apply list (list, add, approve, done, skip, back, remove)
+  agent     setup for one agent: Claude Code, Codex, Cursor, Gemini, OpenCode, Muse, Manus, Grok, Qwen, WorkBuddy
   pdf       Markdown CV or letter → HTML + PDF
   kb        search or index knowledge/
   doctor    check the setup`);
