@@ -6,7 +6,7 @@ job-agent ships as **one plugin per agent, each with the TrueInterview MCP built
 
 ```bash
 npm test                      # unit tests + generated plugins up to date
-npm run gen:plugins           # after editing AGENTS.md, skills/, scripts/ or distribution/
+npm run gen:plugins           # after editing AGENTS.md, skills/, scripts/ or distribution/ (also rebuilds agents/)
 ```
 
 Bump `version` in `distribution/plugin.source.json` and `package.json`, regenerate, commit, push to `main`. The self-hosted marketplaces below pick the change up from the repository; directory listings are re-reviewed per platform.
@@ -22,6 +22,7 @@ Bump `version` in `distribution/plugin.source.json` and `package.json`, regenera
 | `gemini-extension.json` (repo root) | Gemini CLI |
 | `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`, `.cursor-plugin/marketplace.json`, `.github/plugin/marketplace.json` | Each agent's self-hosted marketplace (this repo) |
 | `assets/logo.svg`, `assets/logo.png` (512×512) | Listing icons |
+| `agents/` (generated from `distribution/agents.json`, `AGENTS.md`, `skills/job-run/SKILL.md`) | Per-agent steps, and the setup message (skill pack) for chat and desktop agents without a skills folder: Meta Muse, Manus, Grok, Qwen, WorkBuddy, others. Add an agent by adding an entry to `distribution/agents.json` and running `npm run gen:plugins`. |
 
 ## 1. Live now: the repo is the marketplace
 

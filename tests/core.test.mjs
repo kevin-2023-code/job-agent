@@ -115,6 +115,8 @@ test('installer: file-based agents into a sandbox home, then uninstall', () => {
   assert.equal(r.status, 0, r.stderr);
   assert.ok(existsSync(join(home, '.agents', 'skills', 'job-apply', 'SKILL.md')));
   assert.ok(existsSync(join(home, '.job-agent', 'bin', 'job-agent.mjs')));
+  const listed = spawnSync(process.execPath, [join(home, '.job-agent', 'bin', 'job-agent.mjs'), 'agent', 'qwen', '--message'], { env, encoding: 'utf8' });
+  assert.equal(listed.status, 0, listed.stderr);
   assert.ok(existsSync(join(home, 'job-agent', 'profile', 'profile.yml')));
   const cursor = JSON.parse(rf(join(home, '.cursor', 'mcp.json'), 'utf8'));
   assert.equal(cursor.mcpServers.trueinterview.url, 'https://trueinterview.io/api/mcp');
@@ -125,4 +127,63 @@ test('installer: file-based agents into a sandbox home, then uninstall', () => {
   assert.ok(!existsSync(join(home, '.agents', 'skills', 'job-apply')));
   assert.equal(JSON.parse(rf(join(home, '.cursor', 'mcp.json'), 'utf8')).mcpServers.trueinterview, undefined);
   assert.ok(existsSync(join(home, 'job-agent', 'profile', 'profile.yml')), 'workspace kept');
+});
+
+import { readList, writeList, addRow, setSkip, putBack, waiting, ready, WAITING_MAX } from '../scripts/lib/apply-list.mjs';
+import { loadRegistry, setupMessage, packRunProcedure, agentDoc, keyConfigText } from '../scripts/lib/agents.mjs';
+
+test('to-apply list: own adds are approved, agent picks wait, duplicates and the waiting cap', () => {
+  const rows = [];
+  const a = addRow(rows, { company: 'Stripe', role: 'Backend Engineer', url: 'u1', date: '2026-11-28' });
+  assert.equal(a.row.approved, 'yes');
+  const b = addRow(rows, { company: 'Ramp', role: 'Data Engineer', by: 'agent', note: 'same stack', date: '2026-11-28' });
+  assert.equal(b.row.approved, 'no');
+  assert.deepEqual(waiting(rows).map((r) => r.id), [b.row.id]);
+  assert.deepEqual(ready(rows).map((r) => r.id), [a.row.id]);
+  assert.equal(addRow(rows, { company: 'stripe', role: 'backend engineer', date: 'x' }).added, false);
+  for (let i = waiting(rows).length; i < WAITING_MAX; i++) addRow(rows, { company: `Co${i}`, role: 'R', by: 'agent', date: 'x' });
+  assert.throws(() => addRow(rows, { company: 'One', role: 'Too many', by: 'agent', date: 'x' }), /waiting/);
+  addRow(rows, { company: 'Own', role: 'Still fine', date: 'x' });
+  setSkip(a.row, 'sign_in', 'needs an account');
+  assert.equal(ready(rows).some((r) => r.id === a.row.id), false);
+  assert.throws(() => setSkip(a.row, 'bored'), /kind/);
+  putBack(a.row);
+  assert.equal(a.row.state, 'open');
+  const file = join(mkdtempSync(join(tmpdir(), 'ja-list-')), 'apply-list.tsv');
+  writeList(rows, file);
+  assert.equal(readList(file).length, rows.length);
+});
+
+test('agents: every agent has a page; chat agents get a self-contained skill pack', () => {
+  const reg = loadRegistry();
+  const ids = reg.agents.map((a) => a.id);
+  assert.equal(new Set(ids).size, ids.length);
+  for (const id of ['claude-code', 'codex', 'cursor', 'gemini', 'opencode', 'muse', 'qwen', 'manus', 'grok', 'workbuddy', 'other']) assert.ok(ids.includes(id), id);
+  const proc = packRunProcedure();
+  assert.match(proc, /get_shortlist/);
+  assert.doesNotMatch(proc, /job-agent (list|scan|track)|portals\.yml|`job-apply`/);
+  for (const a of reg.agents) {
+    const doc = agentDoc(a, reg);
+    assert.match(doc, new RegExp(`job-agent with ${a.label.replace(/[()]/g, '.')}`));
+    if (a.skills === 'message') {
+      const msg = setupMessage(a, { time: '8:15am' });
+      assert.match(msg, /## Rules/);
+      assert.match(msg, /### 8\. Summary/);
+      assert.ok(!/Bearer/.test(msg), `${a.id}: the message must not carry a key`);
+      if (a.schedule === 'daily') assert.match(msg, /every day at 8:15am/);
+    }
+    const cfg = keyConfigText(a);
+    if (cfg) assert.match(cfg, /<your TrueInterview key>/);
+  }
+});
+
+test('agent CLI: message only for agents without a skills folder', () => {
+  const bin = join(PKG_ROOT, 'bin', 'job-agent.mjs');
+  const ok = spawnSync(process.execPath, [bin, 'agent', 'muse', '--message', '--time', '7:00am'], { encoding: 'utf8' });
+  assert.equal(ok.status, 0, ok.stderr);
+  assert.match(ok.stdout, /every day at 7:00am Pacific Time/);
+  const no = spawnSync(process.execPath, [bin, 'agent', 'claude-code', '--message'], { encoding: 'utf8' });
+  assert.equal(no.status, 1);
+  const bad = spawnSync(process.execPath, [bin, 'agent', 'nope'], { encoding: 'utf8' });
+  assert.equal(bad.status, 1);
 });

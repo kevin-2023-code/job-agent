@@ -4,6 +4,8 @@
 //   AGENTS.md          → skills/job-agent/SKILL.md (the overview skill every plugin loads)
 //   skills/, bin/, scripts/, templates/, examples/, docs/, LICENSE → copied into each plugin
 //   distribution/plugin.source.json → manifests and marketplace entries
+//   distribution/agents.json + AGENTS.md + skills/job-run → agents/<id>.md, agents/README.md
+//     (per-agent steps, and the setup message that carries the skill pack to chat agents)
 //
 //   node scripts/gen-plugins.mjs           write everything
 //   node scripts/gen-plugins.mjs --check   exit 1 if anything on disk differs (CI)
@@ -11,6 +13,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadRegistry, agentDoc, agentsIndex } from './lib/agents.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const HARNESSES = ['claude', 'codex', 'cursor', 'copilot'];
@@ -167,6 +170,8 @@ This build of the plugin ships no code and runs none. Where a skill says \`job-a
 - \`kb\`: search \`knowledge/\` and \`profile/\` with your own search tools.
 - \`pdf\`: write the résumé or letter as Markdown in \`output/\` and tell the candidate to print it to PDF from their browser.
 - \`changed\`: compare \`profile/cv.md\` and \`profile/profile.yml\` with what the account already holds.
+- \`list\`: keep \`data/apply-list.tsv\` as a tab-separated table with the columns id, added, company, role, url, added_by, note, approved, state, kind, reason; connected, use \`get_shortlist\` and \`update_shortlist\` instead.
+- \`agent\`: the steps per agent are at https://github.com/kevin-2023-code/job-agent/tree/main/agents.
 `;
 
 const CLAUDE_REWRITES = {
@@ -201,6 +206,9 @@ function claudeText(rel, content) {
 function generate() {
   const files = new Map();
   files.set('skills/job-agent/SKILL.md', overviewSkill());
+  const registry = loadRegistry(ROOT);
+  files.set('agents/README.md', agentsIndex(registry));
+  for (const a of registry.agents) files.set(`agents/${a.id}.md`, agentDoc(a, registry, { root: ROOT }));
   for (const [p, v] of Object.entries(rootFiles())) files.set(p, json(v));
 
   const shared = [];
@@ -213,6 +221,7 @@ function generate() {
   }
   shared.push(['skills/job-agent/SKILL.md', files.get('skills/job-agent/SKILL.md')]);
   shared.push(['LICENSE', readFileSync(join(ROOT, 'LICENSE'), 'utf8')]);
+  shared.push(['distribution/agents.json', readFileSync(join(ROOT, 'distribution', 'agents.json'), 'utf8')]);
   const readme = readFileSync(join(ROOT, 'distribution', 'PLUGIN_README.md'), 'utf8');
 
   // Claude directory: no scripts, no HTML, no SVG other than the icon, no maintainer docs.
@@ -233,10 +242,10 @@ const files = generate();
 const check = process.argv.includes('--check');
 let drift = 0;
 
-// Files under plugins/ that are no longer generated.
-const stale = existsSync(join(ROOT, 'plugins'))
-  ? walk(join(ROOT, 'plugins')).map((a) => posix(relative(ROOT, a))).filter((p) => !files.has(p))
-  : [];
+// Files under plugins/ and agents/ that are no longer generated.
+const stale = ['plugins', 'agents'].flatMap((d) => existsSync(join(ROOT, d))
+  ? walk(join(ROOT, d)).map((a) => posix(relative(ROOT, a))).filter((p) => !files.has(p))
+  : []);
 
 for (const [p, content] of files) {
   const abs = join(ROOT, p);
