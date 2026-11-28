@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "job-agent",
-  "description": "Open-source job-search skills: find and score roles, tailor your résumé, apply on company sites the way you set it (your agent submits, or stops at Submit for you), work a to-apply list on a daily schedule, track applications and prep for interviews. Uses the TrueInterview MCP for live jobs, real interview data and your saved records when you sign in, and your own local files when you don't.",
+  "description": "Open-source job-search skills: find and score roles, tailor your résumé, fill application forms on company sites and stop at Submit for you, keep a to-apply list, track applications and prep for interviews. Uses the TrueInterview MCP for live jobs, real interview data and your saved records when you sign in, and your own local files when you don't.",
   "owner": {
     "name": "job-agent contributors",
     "url": "https://github.com/kevin-2023-code/job-agent"
@@ -10,7 +10,7 @@
     {
       "name": "job-agent",
       "source": "./plugins/claude",
-      "description": "Open-source job-search skills: find and score roles, tailor your résumé, apply on company sites the way you set it (your agent submits, or stops at Submit for you), work a to-apply list on a daily schedule, track applications and prep for interviews. Uses the TrueInterview MCP for live jobs, real interview data and your saved records when you sign in, and your own local files when you don't.",
+      "description": "Open-source job-search skills: find and score roles, tailor your résumé, fill application forms on company sites and stop at Submit for you, keep a to-apply list, track applications and prep for interviews. Uses the TrueInterview MCP for live jobs, real interview data and your saved records when you sign in, and your own local files when you don't.",
       "version": "0.4.0",
       "category": "productivity"
     }
