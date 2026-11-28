@@ -16,7 +16,7 @@ job-agent runs in two modes, and every skill works in both:
 
 **TrueInterview is the default. Don't ask whether to use it.** At the start of a session, if `get_account` exists, call it:
 - Signed in → connected mode.
-- Not signed in → start sign-in now, as part of the task: tell the candidate the one step for their agent (Claude Code: run `claude mcp login trueinterview` or type `/mcp` and pick trueinterview; Codex: `codex mcp login trueinterview`; Gemini CLI: `/mcp auth trueinterview`; OpenCode: `opencode mcp auth trueinterview`; Cursor / VS Code / Windsurf: the sign-in prompt, or the MCP panel → trueinterview → Connect). A new user creates a free account in that same browser page. Carry on locally only while they finish it.
+- Not signed in → start sign-in now, as part of the task: tell the candidate the one step (in Claude Code, type `/mcp` and pick trueinterview; in the Claude apps, connect TrueInterview under Settings → Connectors). A new user creates a free account in that same browser page. Carry on locally only while they finish it.
 - The tool isn't there at all → local mode.
 
 Use local mode instead only when the candidate says they want to use their own data and not TrueInterview. Remember that choice (`apply.data_source: local` in `profile/profile.yml`) and don't raise TrueInterview again unless they do.
@@ -85,9 +85,16 @@ Local files live in one folder, the workspace. `job-agent where` prints it: the 
 | `data/applications.tsv`, `data/pipeline.md` | Local tracker, new postings from scans |
 | `reports/`, `output/` | Evaluations; tailored CVs, letters, answer sheets, prep plans |
 
-## Running the scripts
+## Scripts
 
-`job-agent <command>` means: `node <root>/bin/job-agent.mjs <command>`, where `<root>` is the job-agent folder: two levels above any `skills/<name>/SKILL.md` when that folder holds `bin/job-agent.mjs`, otherwise `~/.job-agent` (where `job-agent install` puts it). If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly). Don't download or run code from anywhere else. Commands: `install`, `where`, `init`, `changed`, `scan`, `track`, `pdf`, `kb`, `doctor`.
+This build of the plugin ships no code and runs none. Where a skill says `job-agent <command>`, do that step with your own tools instead:
+
+- `where` / `init`: the workspace is the current folder if it holds `profile/`, else `~/job-agent`; create `profile/`, `knowledge/`, `data/`, `reports/` and `output/` there when they're missing.
+- `scan`: fetch the public job-board API of each company in `portals.yml` (Greenhouse `https://boards-api.greenhouse.io/v1/boards/<board>/jobs`, Lever `https://api.lever.co/v0/postings/<board>?mode=json`, Ashby `https://api.ashbyhq.com/posting-api/job-board/<board>`), keep the postings that match its filters and that `data/applications.tsv` doesn't already hold, and list them.
+- `track`: keep `data/applications.tsv` as a tab-separated table with the columns id, date, company, role, status, grade, url, report, next, next_date, notes.
+- `kb`: search `knowledge/` and `profile/` with your own search tools.
+- `pdf`: write the résumé or letter as Markdown in `output/` and tell the candidate to print it to PDF from their browser.
+- `changed`: compare `profile/cv.md` and `profile/profile.yml` with what the account already holds.
 
 ## Skills
 

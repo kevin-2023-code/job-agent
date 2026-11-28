@@ -151,20 +151,34 @@ function rootFiles() {
   };
 }
 
-// The Claude plugin ships no scripts and must not fetch code, so its overview skill
-// drops the npx fallback: the scripts are used only when installed separately.
 // The Claude directory refuses a plugin whose text tells Claude or the user to add an MCP
-// server the plugin doesn't declare, or to run code from elsewhere. The Claude build
-// therefore drops the installer and the browser-MCP setup notes.
+// server the plugin doesn't declare, and the publisher attests that the plugin runs no
+// code outside its declared MCP servers. So the Claude build ships no scripts and its
+// text runs none: no installer, no local Node scripts, no browser-MCP setup notes, and
+// sign-in only for the one server it declares. Each entry is [from, to]; `from` is a
+// string or a RegExp, and must match.
+const CLAUDE_SCRIPTS_SECTION = `## Scripts
+
+This build of the plugin ships no code and runs none. Where a skill says \`job-agent <command>\`, do that step with your own tools instead:
+
+- \`where\` / \`init\`: the workspace is the current folder if it holds \`profile/\`, else \`~/job-agent\`; create \`profile/\`, \`knowledge/\`, \`data/\`, \`reports/\` and \`output/\` there when they're missing.
+- \`scan\`: fetch the public job-board API of each company in \`portals.yml\` (Greenhouse \`https://boards-api.greenhouse.io/v1/boards/<board>/jobs\`, Lever \`https://api.lever.co/v0/postings/<board>?mode=json\`, Ashby \`https://api.ashbyhq.com/posting-api/job-board/<board>\`), keep the postings that match its filters and that \`data/applications.tsv\` doesn't already hold, and list them.
+- \`track\`: keep \`data/applications.tsv\` as a tab-separated table with the columns id, date, company, role, status, grade, url, report, next, next_date, notes.
+- \`kb\`: search \`knowledge/\` and \`profile/\` with your own search tools.
+- \`pdf\`: write the résumé or letter as Markdown in \`output/\` and tell the candidate to print it to PDF from their browser.
+- \`changed\`: compare \`profile/cv.md\` and \`profile/profile.yml\` with what the account already holds.
+`;
+
 const CLAUDE_REWRITES = {
   'skills/job-agent/SKILL.md': [
-    [
-      "If you can't find it, `npx -y github:kevin-2023-code/job-agent <command>` works anywhere with Node 18+.",
-      "If neither exists, the scripts aren't installed: do the step with your own tools (read and write the workspace files directly). Don't download or run code from anywhere else.",
-    ],
+    [/## Running the scripts\n\n[^\n]*\n/, CLAUDE_SCRIPTS_SECTION],
     [
       '- The tool isn\'t there at all → local mode, and offer the one-line install (`npx -y github:kevin-2023-code/job-agent install`) once.',
       "- The tool isn't there at all → local mode.",
+    ],
+    [
+      "tell the candidate the one step for their agent (Claude Code: run `claude mcp login trueinterview` or type `/mcp` and pick trueinterview; Codex: `codex mcp login trueinterview`; Gemini CLI: `/mcp auth trueinterview`; OpenCode: `opencode mcp auth trueinterview`; Cursor / VS Code / Windsurf: the sign-in prompt, or the MCP panel → trueinterview → Connect)",
+      'tell the candidate the one step (in Claude Code, type `/mcp` and pick trueinterview; in the Claude apps, connect TrueInterview under Settings → Connectors)',
     ],
   ],
   'skills/job-apply/SKILL.md': [
@@ -177,8 +191,9 @@ const CLAUDE_REWRITES = {
 
 function claudeText(rel, content) {
   for (const [from, to] of CLAUDE_REWRITES[rel] ?? []) {
-    if (!content.includes(from)) throw new Error(`claudeText: text to rewrite not found in ${rel}: ${from.slice(0, 60)}…`);
-    content = content.replace(from, to);
+    const found = from instanceof RegExp ? from.test(content) : content.includes(from);
+    if (!found) throw new Error(`claudeText: text to rewrite not found in ${rel}: ${String(from).slice(0, 60)}…`);
+    content = content.replace(from, () => to);
   }
   return content;
 }
